@@ -1,0 +1,4 @@
+- fix display
+- disk cache
+- writing disks
+- handling function keys (e.g., to connect images to drives)
