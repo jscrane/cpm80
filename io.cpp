@@ -64,13 +64,13 @@ void IO::draw(struct font &f, char ch, unsigned i, unsigned j) {
 		unsigned x = i * f.w;
 		for (unsigned c = 0; c < f.w; c++) {
 			byte col = *p++, ecol = *q++, d = (col ^ ecol);
-			unsigned y = j * f.h;
+			unsigned y = (j + 1)*f.h;
 			for (unsigned r = 0, b = 0x80; r < f.h; r++, b /= 2) {
+				y--;
 				if (d & b) {
 					utft.setColor((col & b)? _fg: _bg);
 					utft.drawPixel(x, y);
 				}
-				y--;
 			}
 			x++;
 		}
@@ -92,6 +92,9 @@ Serial.println((byte)ch);
 	case 0x0d:		// '\r'
 		draw(f, ' ', c, r);
 		c = 0;
+		break;
+	case 0x0a:		// '\n'
+		draw(f, ' ', c, r);
 		r++;
 		break;
 	case 0x1b:		// esc
