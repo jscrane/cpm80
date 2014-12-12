@@ -13,18 +13,18 @@ public:
 	byte in(byte p, i8080 *cpu);
 	void out(byte p, byte b, i8080 *cpu);
 
-	void start(const char *dir);
-
+	void reset();
 private:
 	byte kbd_read();
-	void reset();
+	void cls();
+
 	void draw(struct font &, char, unsigned, unsigned);
 	void display(byte);
 
-	byte seldsk, settrk, setsec, trk, sec;
+	byte settrk, setsec, trk, sec;
 	word setdma;
 	Memory &_mem;
-	bool _shift;
+	bool _shift, _esc, _ansi, _ansi2;
 };
 
 #endif

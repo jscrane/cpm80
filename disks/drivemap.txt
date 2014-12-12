@@ -1,0 +1,4 @@
+cpma.cpm
+zork1.cpm
+volks4th.cpm
+vlks4th2.cpm

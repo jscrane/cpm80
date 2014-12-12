@@ -2,3 +2,4 @@
 - disk cache
 - writing disks
 - handling function keys (e.g., to connect images to drives)
+- control chars, e.g., to clear the screen

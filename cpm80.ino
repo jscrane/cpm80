@@ -36,7 +36,7 @@ void reset(void) {
 		memory[0xfa00 + i] = cbios[i];
 
 	if (sd)
-		io.start(PROGRAMS);
+		io.reset();
 	else
 		Serial.println("No SD Card");
 

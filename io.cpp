@@ -14,34 +14,45 @@ IO::IO(Memory &mem): _mem(mem) {
 	trk = sec = 0xff;
 }
 
-static File file;
-
-void IO::start(const char *images) {
-	char buf[32];
-	snprintf(buf, sizeof(buf), "%scpma.cpm", images);
-	file = SD.open(buf);
-	if (!file) {
-		Serial.print(buf);
-		Serial.println(": open failed");
-	}
-	reset();
-}
+static File drive;
+static char mapping[DRIVES * 13];
+static char *drives[DRIVES];
 
 #define ROWS    30
 #define COLS    64
 static unsigned r, c;
 static char screen[ROWS][COLS];
 
-void IO::reset() {
-	_shift = false;
-
-	UTFTDisplay::begin(TFT_BG, TFT_FG);
-	clear();
-
+void IO::cls() {
 	r = c = 0;
 	for (int j = 0; j < ROWS; j++)
 		for (int i = 0; i < COLS; i++)
 			screen[j][i] = ' ';
+	clear();
+}
+
+void IO::reset() {
+	File map = SD.open(PROGRAMS"drivemap.txt");
+	if (map) {
+		int n = map.read(mapping, sizeof(mapping));
+		map.close();
+		char *p = mapping, *q = p;
+		for (unsigned i = 0; i < DRIVES; i++) {
+			while (*p != '\n')
+				p++;
+			*p++ = 0;
+			drives[i] = q;
+			q = p;
+			if (p - mapping >= n)
+				break;
+		}
+	} else
+		Serial.println("drivemap: open failed");
+	
+	_shift = _esc = _ansi = false;
+
+	UTFTDisplay::begin(TFT_BG, TFT_FG);
+	cls();
 }
 
 struct font f = { plain_font, 5, 8, 0x20 };
@@ -69,20 +80,40 @@ void IO::draw(struct font &f, char ch, unsigned i, unsigned j) {
 
 void IO::display(byte b) {
 	char ch = (char)b;
+Serial.println((byte)ch);
 	switch(ch) {
-	case 0x08:
+	case 0x08:		// '\b'
 		draw(f, ' ', c, r);
 		if (c-- == 0) {
 			r--;
 			c = COLS-1;
 		}
 		break;
-	case 0x0d:
+	case 0x0d:		// '\r'
 		draw(f, ' ', c, r);
 		c = 0;
 		r++;
 		break;
+	case 0x1b:		// esc
+		_esc = true;
+		return;
 	default:
+		if (_esc && ch == '[') {
+			_ansi = true;
+			_esc = false;
+			return;
+		}
+		if (_ansi && ch == '2') {
+			_ansi2 = true;
+			_ansi = false;
+			return;
+		}
+		if (_ansi2 && ch == 'J') {
+			cls();
+			_ansi2 = false;
+			return;
+		}
+		_esc = _ansi = _ansi2 = false;
 		if (ch >= 0x20 && ch < 0x7f) {
 			draw(f, ch, c, r);
 			if (++c == COLS) {
@@ -173,10 +204,10 @@ byte IO::in(byte port, i8080 *cpu) {
 		if (trk != settrk || sec != setsec) {
 			trk = settrk;
 			sec = setsec;
-			file.seek(128*(26*trk + sec -1));
+			drive.seek(128*(26*trk + sec -1));
 		}
 		byte buf[128];
-		int n = file.read(buf, sizeof(buf));
+		int n = drive.read(buf, sizeof(buf));
 		sec++;
 		c = (n < 0);
 		for (int i = 0; i < n; i++)
@@ -189,8 +220,16 @@ void IO::out(byte port, byte a, i8080 *cpu) {
 	if (port == 4)
 		display(a);
 	else if (port == 20) {
-		seldsk = a;
 		trk = sec = 0xff;
+		if (drive)
+			drive.close();
+		char buf[32];
+		snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
+		drive = SD.open(buf);
+		if (!drive) {
+			Serial.print(buf);
+			Serial.println(": open failed");
+		}
 	} else if (port == 21)
 		settrk = a;
 	else if (port == 22)
