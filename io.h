@@ -23,6 +23,8 @@ private:
 
 	void dsk_reset();
 	byte dsk_read();
+	byte dsk_write();
+	void dsk_seek();
 	void dsk_select(byte a);
 	byte settrk, setsec, trk, sec;
 	word setdma;

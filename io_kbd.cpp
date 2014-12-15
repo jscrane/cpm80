@@ -57,8 +57,9 @@ byte IO::kbd_read() {
 	for (;;) {
 		while (!ps2.available())
 			;
-		unsigned scan = ps2.read();
-		bool up = ps2.isbreak();
+		unsigned code = ps2.read2();
+		byte scan = (code & 0xff);
+		bool up = (code & 0x0100);
 		if (!kbd_modifier(scan, !up) && up) {
 			byte k = (_shift? shiftmap[scan]: scanmap[scan]);
 			if (k != 0xff) {

@@ -1,3 +1,2 @@
 - handling function keys
-- writing disks
 - disk cache (need more ram)

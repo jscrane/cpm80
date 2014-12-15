@@ -204,14 +204,12 @@ setdma:	;set	dma address given by registers b and c
 	out	(23), a
 	ret
 ;
-read:	;perform read operation (usually this is similar to write
-;	so we will allow space to set up read command, then use
-;	common code in write)
+read:	;perform read operation
 	in	(14), A
 	ret
 ;
 write:	;perform a write operation
-	out	(14), A
+	in	(15), A
 	ret
 ;
 ;	the remainder of the cbios is reserved uninitialized

@@ -20,6 +20,8 @@ byte IO::in(byte port, i8080 *cpu) {
 		c = kbd_avail();
 	else if (port == 14)
 		c = dsk_read();
+	else if (port == 15)
+		c = dsk_write();
 	return c;
 }
 
