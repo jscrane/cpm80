@@ -8,23 +8,31 @@ struct font {
 
 class IO: public i8080::Ports, public UTFTDisplay {
 public:
-	IO(Memory &);
+	IO(Memory &mem): _mem(mem) {}
 
 	byte in(byte p, i8080 *cpu);
 	void out(byte p, byte b, i8080 *cpu);
 
 	void reset();
 private:
+	void kbd_reset();
 	byte kbd_read();
-	void cls();
+	byte kbd_avail();
+	bool kbd_modifier(unsigned scan, bool key_down);
+	bool _shift, _ctrl;
 
-	void draw(struct font &, char, unsigned, unsigned);
-	void display(byte);
-
+	void dsk_reset();
+	byte dsk_read();
+	void dsk_select(byte a);
 	byte settrk, setsec, trk, sec;
 	word setdma;
 	Memory &_mem;
-	bool _shift, _esc, _ansi, _ansi2;
+
+	void scr_reset();
+	void scr_clear();
+	void scr_draw(struct font &, char, unsigned, unsigned);
+	void scr_display(byte);
+	bool _esc, _ansi, _ansi2;
 };
 
 #endif

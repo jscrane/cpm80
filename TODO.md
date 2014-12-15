@@ -1,5 +1,3 @@
-- fix display
-- disk cache
+- handling function keys
 - writing disks
-- handling function keys (e.g., to connect images to drives)
-- control chars, e.g., to clear the screen
+- disk cache (need more ram)

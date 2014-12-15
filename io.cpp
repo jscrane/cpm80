@@ -3,237 +3,32 @@
 #include <SD.h>
 #include <r65emu.h>
 #include <i8080.h>
-#include <ps2drv.h>
-#include <utftdisplay.h>
 
 #include "io.h"
-#include "config.h"
-#include "plain_font.h"
-
-IO::IO(Memory &mem): _mem(mem) {
-	trk = sec = 0xff;
-}
-
-static File drive;
-static char mapping[DRIVES * 13];
-static char *drives[DRIVES];
-
-#define ROWS    30
-#define COLS    64
-static unsigned r, c;
-static char screen[ROWS][COLS];
-
-void IO::cls() {
-	r = c = 0;
-	for (int j = 0; j < ROWS; j++)
-		for (int i = 0; i < COLS; i++)
-			screen[j][i] = ' ';
-	clear();
-}
 
 void IO::reset() {
-	File map = SD.open(PROGRAMS"drivemap.txt");
-	if (map) {
-		int n = map.read(mapping, sizeof(mapping));
-		map.close();
-		char *p = mapping, *q = p;
-		for (unsigned i = 0; i < DRIVES; i++) {
-			while (*p != '\n')
-				p++;
-			*p++ = 0;
-			drives[i] = q;
-			q = p;
-			if (p - mapping >= n)
-				break;
-		}
-	} else
-		Serial.println("drivemap: open failed");
-	
-	_shift = _esc = _ansi = false;
-
-	UTFTDisplay::begin(TFT_BG, TFT_FG);
-	cls();
-}
-
-struct font f = { plain_font, 5, 8, 0x20 };
-
-void IO::draw(struct font &f, char ch, unsigned i, unsigned j) {
-	if (screen[j][i] != ch) {
-		const byte *p = f.data + f.w * (ch - f.off);
-		const byte *q = f.data + f.w * (screen[j][i] - f.off);
-		unsigned x = i * f.w;
-		for (unsigned c = 0; c < f.w; c++) {
-			byte col = *p++, ecol = *q++, d = (col ^ ecol);
-			unsigned y = (j + 1)*f.h;
-			for (unsigned r = 0, b = 0x80; r < f.h; r++, b /= 2) {
-				y--;
-				if (d & b) {
-					utft.setColor((col & b)? _fg: _bg);
-					utft.drawPixel(x, y);
-				}
-			}
-			x++;
-		}
-		screen[j][i] = ch;
-	}
-}
-
-void IO::display(byte b) {
-	char ch = (char)b;
-Serial.println((byte)ch);
-	switch(ch) {
-	case 0x08:		// '\b'
-		draw(f, ' ', c, r);
-		if (c-- == 0) {
-			r--;
-			c = COLS-1;
-		}
-		break;
-	case 0x0d:		// '\r'
-		draw(f, ' ', c, r);
-		c = 0;
-		break;
-	case 0x0a:		// '\n'
-		draw(f, ' ', c, r);
-		r++;
-		break;
-	case 0x1b:		// esc
-		_esc = true;
-		return;
-	default:
-		if (_esc && ch == '[') {
-			_ansi = true;
-			_esc = false;
-			return;
-		}
-		if (_ansi && ch == '2') {
-			_ansi2 = true;
-			_ansi = false;
-			return;
-		}
-		if (_ansi2 && ch == 'J') {
-			cls();
-			_ansi2 = false;
-			return;
-		}
-		_esc = _ansi = _ansi2 = false;
-		if (ch >= 0x20 && ch < 0x7f) {
-			draw(f, ch, c, r);
-			if (++c == COLS) {
-				c = 0;
-				r++;
-			}
-		}
-	}
-	if (r == ROWS) {
-		// scroll
-		r--;
-		for (int j = 0; j < (ROWS-1); j++)
-			for (int i = 0; i < COLS; i++)
-				draw(f, screen[j+1][i], i, j);
-		for (int i = 0; i < COLS; i++)
-			draw(f, ' ', i, ROWS-1);
-	}
-	draw(f, '_', c, r);
-}
-
-// ascii map for scan-codes
-static const byte scanmap[] = {
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x00
-	0xff, 0xff, 0xff, 0xff, 0xff, 0x09, 0x60, 0xff,	 // 0x08
-	0xff, 0xff, 0xff, 0xff, 0xff, 0x51, 0x31, 0xff,	 // 0x10
-	0xff, 0xff, 0x5a, 0x53, 0x41, 0x57, 0x32, 0xff,	 // 0x18
-	0xff, 0x43, 0x58, 0x44, 0x45, 0x34, 0x33, 0xff,	 // 0x20
-	0xff, 0x20, 0x56, 0x46, 0x54, 0x52, 0x35, 0xff,	 // 0x28
-	0xff, 0x4e, 0x42, 0x48, 0x47, 0x59, 0x36, 0xff,	 // 0x30
-	0xff, 0xff, 0x4d, 0x4a, 0x55, 0x37, 0x38, 0xff,	 // 0x38
-	0xff, 0x2c, 0x4b, 0x49, 0x4f, 0x30, 0x39, 0xff,	 // 0x40
-	0xff, 0x2e, 0x2f, 0x4c, 0x3b, 0x50, 0x2d, 0xff,	 // 0x48
-	0xff, 0xff, 0x27, 0xff, 0x5b, 0x3d, 0xff, 0xff,	 // 0x50
-	0xff, 0xff, 0x0d, 0x5d, 0xff, 0x23, 0xff, 0xff,	 // 0x58
-	0xff, 0x5c, 0xff, 0xff, 0xff, 0xff, 0x08, 0xff,	 // 0x60
-	0xff, 0x31, 0xff, 0x34, 0x37, 0xff, 0xff, 0xff,	 // 0x68
-	0x30, 0x7f, 0x32, 0x35, 0x36, 0x38, 0x1b, 0xff,	 // 0x70
-	0xff, 0x2b, 0x33, 0x2d, 0x2a, 0x39, 0xff, 0xff,	 // 0x78
-};
-
-static const byte shiftmap[] = {
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x00
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x08
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x21, 0xff,	 // 0x10
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x22, 0xff,	 // 0x18
-	0xff, 0xff, 0xff, 0xff, 0xff, 0x24, 0x23, 0xff,	 // 0x20
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x25, 0xff,	 // 0x28
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x5e, 0xff,	 // 0x30
-	0xff, 0xff, 0xff, 0xff, 0xff, 0x26, 0x2a, 0xff,	 // 0x38
-	0xff, 0x3c, 0xff, 0xff, 0xff, 0x29, 0x28, 0xff,	 // 0x40
-	0xff, 0x3e, 0x3f, 0xff, 0x3a, 0xff, 0x5f, 0xff,	 // 0x48
-	0xff, 0xff, 0x40, 0xff, 0x7b, 0x2b, 0xff, 0xff,	 // 0x50
-	0xff, 0xff, 0xff, 0x7d, 0xff, 0x7e, 0xff, 0xff,	 // 0x58
-	0xff, 0x7c, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x60
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x68
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x70
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x78
-};
-
-byte IO::kbd_read() {
-	for (;;) {
-		while (!ps2.available())
-			;
-		unsigned scan = ps2.read();
-		if (ps2.isbreak()) {
-			if (Keyboard::isshift(scan))
-				_shift = false;
-			else {
-				byte k = (_shift? shiftmap[scan]: scanmap[scan]);
-				if (k != 0xff)
-					return k;
-			}
-		} else if (Keyboard::isshift(scan))
-			_shift = true;
-	}
+	dsk_reset();
+	kbd_reset();
+	scr_reset();
 }
 
 byte IO::in(byte port, i8080 *cpu) {
 	byte c = 0;
-	if (port == 4) {
+	if (port == 4)
 		c = kbd_read();
-	} else if (port == 2) {
-		// const
-		if (ps2.available())
-			c = 0xff;
-	} else if (port == 14) {
-		// read (from dsk)
-		if (trk != settrk || sec != setsec) {
-			trk = settrk;
-			sec = setsec;
-			drive.seek(128*(26*trk + sec -1));
-		}
-		byte buf[128];
-		int n = drive.read(buf, sizeof(buf));
-		sec++;
-		c = (n < 0);
-		for (int i = 0; i < n; i++)
-			_mem[setdma + i] = buf[i];
-	}
+	else if (port == 2)
+		c = kbd_avail();
+	else if (port == 14)
+		c = dsk_read();
 	return c;
 }
 
 void IO::out(byte port, byte a, i8080 *cpu) {
 	if (port == 4)
-		display(a);
-	else if (port == 20) {
-		trk = sec = 0xff;
-		if (drive)
-			drive.close();
-		char buf[32];
-		snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
-		drive = SD.open(buf);
-		if (!drive) {
-			Serial.print(buf);
-			Serial.println(": open failed");
-		}
-	} else if (port == 21)
+		scr_display(a);
+	else if (port == 20)
+		dsk_select(a);
+	else if (port == 21)
 		settrk = a;
 	else if (port == 22)
 		setsec = a;
