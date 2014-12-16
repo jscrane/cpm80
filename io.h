@@ -34,7 +34,8 @@ private:
 	void scr_clear();
 	void scr_draw(struct font &, char, unsigned, unsigned);
 	void scr_display(byte);
-	bool _esc, _ansi, _ansi2;
+	bool _esc, _ansi;
+	unsigned _value, _line;
 };
 
 #endif

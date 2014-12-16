@@ -59,7 +59,7 @@ byte IO::kbd_read() {
 			;
 		unsigned code = ps2.read2();
 		byte scan = (code & 0xff);
-		bool up = (code & 0x0100);
+		bool up = (code & 0xf000) != 0;
 		if (!kbd_modifier(scan, !up) && up) {
 			byte k = (_shift? shiftmap[scan]: scanmap[scan]);
 			if (k != 0xff) {
@@ -75,7 +75,7 @@ byte IO::kbd_avail() {
 	while (ps2.available()) {
 		unsigned code = ps2.peek();
 		byte scan = (code & 0xff);
-		bool up = (code & 0x0100);
+		bool up = (code & 0xf000) != 0;
 		if (kbd_modifier(scan, !up) || !up)
 			ps2.read();
 		else

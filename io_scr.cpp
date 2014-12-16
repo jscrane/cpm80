@@ -29,7 +29,8 @@ void IO::scr_clear() {
 }
 
 void IO::scr_reset() {
-	_esc = _ansi = _ansi2 = false;
+	_esc = _ansi = false;
+	_line = _value = 0;
 
 	UTFTDisplay::begin(TFT_BG, TFT_FG);
 	scr_clear();
@@ -58,7 +59,7 @@ void IO::scr_draw(struct font &f, char ch, unsigned i, unsigned j) {
 
 void IO::scr_display(byte b) {
 	char ch = (char)b;
-Serial.println((byte)ch);
+//Serial.println((byte)ch);
 	switch(ch) {
 	case 0x08:		// '\b'
 		scr_draw(f, ' ', c, r);
@@ -78,37 +79,102 @@ Serial.println((byte)ch);
 		_esc = true;
 		return;
 	default:
-		if (_esc && ch == '[') {
-			_ansi = true;
+		if (_esc) {
 			_esc = false;
-			return;
+			if (ch == '[') {
+				_ansi = true;
+				return;
+			}
 		}
-		if (_ansi && ch == '2') {
-			_ansi2 = true;
+		if (_ansi) {
+			switch (ch) {
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				_value = _value * 10 + ch - '0';
+				return;
+
+			case ';':
+				_line = _value;
+				_value = 0;
+				return;
+
+			case 'K':
+				for (unsigned i = c; i < COLS; i++)
+					scr_draw(f, ' ', i, r);
+				break;
+
+			case 'J':
+				if (_value == 2)
+					scr_clear();
+				break;
+
+			case 'A':
+				scr_draw(f, ' ', c, r);
+				r -= _value;
+				break;
+
+			case 'B':
+				scr_draw(f, ' ', c, r);
+				r += _value;
+				break;
+
+			case 'C':
+				scr_draw(f, ' ', c, r);
+				c += _value;
+				break;
+
+			case 'D':
+				scr_draw(f, ' ', c, r);
+				c -= _value;
+				break;
+
+			case 'H':
+				scr_draw(f, ' ', c, r);
+				r = _line;
+				c = _value;
+				break;
+
+			default:
+				// ???
+				Serial.println(ch);
+				break;
+			}
+
+			if (r < 0) r = 0;
+			else if (r > ROWS-1) r = ROWS-1;
+
+			if (c < 0) c = 0;
+			if (c > COLS-1) c = COLS-1;
+
+			_value = _line = 0;
 			_ansi = false;
-			return;
-		}
-		if (_ansi2 && ch == 'J') {
-			scr_clear();
-			_ansi2 = false;
-			return;
-		}
-		_esc = _ansi = _ansi2 = false;
-		if (ch >= 0x20 && ch < 0x7f) {
-			scr_draw(f, ch, c, r);
-			if (++c == COLS) {
-				c = 0;
-				r++;
+		} else {
+			_esc = _ansi = false;
+			_line = _value = 0;
+			if (ch >= 0x20 && ch < 0x7f) {
+				scr_draw(f, ch, c, r);
+				if (++c == COLS) {
+					c = 0;
+					r++;
+				}
 			}
 		}
 	}
 	if (r == ROWS) {
 		// scroll
 		r--;
-		for (int j = 0; j < (ROWS-1); j++)
+		for (unsigned j = 0; j < (ROWS-1); j++)
 			for (int i = 0; i < COLS; i++)
 				scr_draw(f, screen[j+1][i], i, j);
-		for (int i = 0; i < COLS; i++)
+		for (unsigned i = 0; i < COLS; i++)
 			scr_draw(f, ' ', i, ROWS-1);
 	}
 	scr_draw(f, '_', c, r);
