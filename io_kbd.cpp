@@ -57,11 +57,11 @@ byte IO::kbd_read() {
 	for (;;) {
 		while (!ps2.available())
 			;
-		unsigned code = ps2.read2();
-		byte scan = (code & 0xff);
-		bool up = (code & 0xf000) != 0;
-		if (!kbd_modifier(scan, !up) && up) {
-			byte k = (_shift? shiftmap[scan]: scanmap[scan]);
+		unsigned scan = ps2.read2();
+		byte key = scan & 0xff;
+		bool down = is_down(scan);
+		if (!kbd_modifier(key, down) && !down) {
+			byte k = (_shift? shiftmap[key]: scanmap[key]);
 			if (k != 0xff) {
 				if (_ctrl)
 					return _shift? k-0x40: k-0x60;
@@ -73,11 +73,11 @@ byte IO::kbd_read() {
 
 byte IO::kbd_avail() {
 	while (ps2.available()) {
-		unsigned code = ps2.peek();
-		byte scan = (code & 0xff);
-		bool up = (code & 0xf000) != 0;
-		if (kbd_modifier(scan, !up) || !up)
-			ps2.read();
+		unsigned scan = ps2.peek();
+		byte key = (scan & 0xff);
+		bool down = is_down(scan);
+		if (kbd_modifier(key, down) || !down)
+			ps2.read2();
 		else
 			return 0xff;
 	}

@@ -7,3 +7,5 @@
   - need 1-bit/sector for presence/absence id: 64 bytes
 - wordstar using instructions here:
   http://jefftranter.blogspot.ie/2014/03/wordstar-30-on-briel-altair-8800.html
+- cp/m 3.0
+- z80 cpu
