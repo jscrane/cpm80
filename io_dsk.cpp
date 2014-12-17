@@ -1,5 +1,6 @@
 #include <Energia.h>
 #include <SD.h>
+#include <UTFT.h>
 #include <r65emu.h>
 #include <i8080.h>
 
@@ -39,6 +40,7 @@ void IO::dsk_seek() {
 }
 
 byte IO::dsk_read() {
+	dsk_led(VGA_RED);
 	dsk_seek();
 	byte buf[128];
 	int n = drive.read(buf, sizeof(buf));
@@ -46,27 +48,33 @@ byte IO::dsk_read() {
 	byte c = (n < 0);
 	for (int i = 0; i < n; i++)
 		_mem[setdma + i] = buf[i];
+	dsk_led();
 	return c;
 }
 
 byte IO::dsk_write() {
+	dsk_led(VGA_BLUE);
 	dsk_seek();
 	byte buf[128];
 	for (int i = 0; i < sizeof(buf); i++)
 		buf[i] = _mem[setdma + i];
 	int n = drive.write(buf, sizeof(buf));
 	sec++;
+	dsk_led();
 	return n < 0;
 }
 
 void IO::dsk_select(byte a) {
+	dsk_led(VGA_RED);
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
 	char buf[32];
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
 	drive = SD.open(buf, O_READ | O_WRITE);
-	if (!drive) {
+	if (drive) 
+		dsk_led();
+	else {
 		Serial.print(buf);
 		Serial.println(": open failed");
 	}

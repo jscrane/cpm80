@@ -30,6 +30,8 @@ private:
 	word setdma;
 	Memory &_mem;
 
+	void dsk_led(unsigned colour = 0x0000);
+
 	void scr_reset();
 	void scr_clear();
 	void scr_draw(struct font &, char, unsigned, unsigned);

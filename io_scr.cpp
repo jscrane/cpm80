@@ -57,6 +57,11 @@ void IO::scr_draw(struct font &f, char ch, unsigned i, unsigned j) {
 	}
 }
 
+void IO::dsk_led(unsigned colour) {
+	utft.setColor(colour);
+	utft.drawPixel(_dx-1, 0);
+}
+
 void IO::scr_display(byte b) {
 	char ch = (char)b;
 //Serial.println((byte)ch);
