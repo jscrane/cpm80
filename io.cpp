@@ -2,6 +2,7 @@
 #include <UTFT.h>
 #include <SD.h>
 #include <r65emu.h>
+#include <ports.h>
 #include <i8080.h>
 
 #include "io.h"
@@ -12,8 +13,9 @@ void IO::reset() {
 	scr_reset();
 }
 
-byte IO::in(byte port, i8080 *cpu) {
+byte IO::in(word port, i8080 *cpu) {
 	byte c = 0;
+	port &= 0xff;
 	if (port == 4)
 		c = kbd_read();
 	else if (port == 2)
@@ -25,7 +27,8 @@ byte IO::in(byte port, i8080 *cpu) {
 	return c;
 }
 
-void IO::out(byte port, byte a, i8080 *cpu) {
+void IO::out(word port, byte a, i8080 *cpu) {
+	port &= 0xff;
 	if (port == 4)
 		scr_display(a);
 	else if (port == 20)

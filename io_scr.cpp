@@ -1,6 +1,7 @@
 #include <Energia.h>
 #include <UTFT.h>
 #include <r65emu.h>
+#include <ports.h>
 #include <i8080.h>
 #include <utftdisplay.h>
 

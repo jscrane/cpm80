@@ -4,6 +4,7 @@
 #include <SpiRAM.h>
 #include <SD.h>
 #include <r65emu.h>
+#include <ports.h>
 #include <i8080.h>
 
 #include "config.h"
@@ -11,19 +12,8 @@
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-void status(const char *fmt, ...) {
-	char tmp[256];  
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf(tmp, sizeof(tmp), fmt, args);
-	Serial.println(tmp);
-	va_end(args);
-}
-
 IO io(memory);
-jmp_buf ex;
-i8080 cpu(memory, ex, status, io);
-bool halted = false;
+i8080 cpu(memory, io);
 ram pages[7];
 
 void reset(void) {
@@ -46,15 +36,13 @@ void reset(void) {
 	memory[2] = 0xfa;
 	cpu.reset();
 //	cpu.debug();
-
-	halted = (setjmp(ex) != 0);
 }
 
 void setup(void) {
 	Serial.begin(115200);
 	hardware_init(cpu);
 
-	memory.put(sram, 0x0000);
+	memory.put(sram, 0x0000, 0xe4);
 
 	for (unsigned i = 0; i < 7; i++)
 		memory.put(pages[i], 0xe400 + 1024*i);
@@ -63,6 +51,6 @@ void setup(void) {
 }
 
 void loop(void) {
-	if (!halted)
+	if (!cpu.halted())
 		cpu.run(INSTRUCTIONS);
 }

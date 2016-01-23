@@ -2,6 +2,7 @@
 #include <SD.h>
 #include <UTFT.h>
 #include <r65emu.h>
+#include <ports.h>
 #include <i8080.h>
 
 #include "io.h"
