@@ -35,7 +35,6 @@ void reset(void) {
 	memory[1] = 0x00;
 	memory[2] = 0xfa;
 	cpu.reset();
-//	cpu.debug();
 }
 
 void setup(void) {
