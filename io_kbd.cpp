@@ -1,4 +1,4 @@
-#include <Energia.h>
+#include <Arduino.h>
 #include <r65emu.h>
 #include <ports.h>
 #include <i8080.h>
@@ -6,7 +6,7 @@
 #include "io.h"
 
 // ascii map for scan-codes
-static const byte scanmap[] = {
+static const uint8_t scanmap[] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x00
 	0xff, 0xff, 0xff, 0xff, 0xff, 0x09, 0x60, 0xff,	 // 0x08
 	0xff, 0xff, 0xff, 0xff, 0xff, 0x71, 0x31, 0xff,	 // 0x10
@@ -25,7 +25,7 @@ static const byte scanmap[] = {
 	0xff, 0x2b, 0x33, 0x2d, 0x2a, 0x39, 0xff, 0xff,	 // 0x78
 };
 
-static const byte shiftmap[] = {
+static const uint8_t shiftmap[] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	 // 0x00
 	0xff, 0xff, 0xff, 0xff, 0xff, 0x09, 0x60, 0xff,	 // 0x08
 	0xff, 0xff, 0xff, 0xff, 0xff, 0x51, 0x21, 0xff,	 // 0x10
@@ -54,15 +54,15 @@ bool IO::kbd_modifier(unsigned scan, bool is_down) {
 	return true;
 }
 
-byte IO::kbd_read() {
+uint8_t IO::kbd_read() {
 	for (;;) {
 		while (!ps2.available())
 			;
 		unsigned scan = ps2.read2();
-		byte key = scan & 0xff;
+		uint8_t key = scan & 0xff;
 		bool down = is_down(scan);
 		if (!kbd_modifier(key, down) && !down) {
-			byte k = (_shift? shiftmap[key]: scanmap[key]);
+			uint8_t k = (_shift? shiftmap[key]: scanmap[key]);
 			if (k != 0xff) {
 				if (_ctrl)
 					return _shift? k-0x40: k-0x60;
@@ -72,10 +72,10 @@ byte IO::kbd_read() {
 	}
 }
 
-byte IO::kbd_avail() {
+uint8_t IO::kbd_avail() {
 	while (ps2.available()) {
 		unsigned scan = ps2.peek();
-		byte key = (scan & 0xff);
+		uint8_t key = (scan & 0xff);
 		bool down = is_down(scan);
 		if (kbd_modifier(key, down) || !down)
 			ps2.read2();

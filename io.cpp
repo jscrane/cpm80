@@ -1,4 +1,4 @@
-#include <Energia.h>
+#include <Arduino.h>
 #include <UTFT.h>
 #include <SD.h>
 #include <r65emu.h>
@@ -13,8 +13,8 @@ void IO::reset() {
 	scr_reset();
 }
 
-byte IO::in(word port, i8080 *cpu) {
-	byte c = 0;
+uint8_t IO::in(uint16_t port, i8080 *cpu) {
+	uint8_t c = 0;
 	port &= 0xff;
 	if (port == 4)
 		c = kbd_read();
@@ -27,7 +27,7 @@ byte IO::in(word port, i8080 *cpu) {
 	return c;
 }
 
-void IO::out(word port, byte a, i8080 *cpu) {
+void IO::out(uint16_t port, uint8_t a, i8080 *cpu) {
 	port &= 0xff;
 	if (port == 4)
 		scr_display(a);

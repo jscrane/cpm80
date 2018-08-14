@@ -2,32 +2,32 @@
 #define __IO_H__
 
 struct font {
-	const byte *data;
-	byte w, h, off;
+	const uint8_t *data;
+	uint8_t w, h, off;
 };
 
 class IO: public PortDevice<i8080>, public UTFTDisplay {
 public:
 	IO(Memory &mem): _mem(mem) {}
 
-	byte in(word p, i8080 *cpu);
-	void out(word p, byte b, i8080 *cpu);
+	uint8_t in(uint16_t p, i8080 *cpu);
+	void out(uint16_t p, uint8_t b, i8080 *cpu);
 
 	void reset();
 private:
 	void kbd_reset();
-	byte kbd_read();
-	byte kbd_avail();
+	uint8_t kbd_read();
+	uint8_t kbd_avail();
 	bool kbd_modifier(unsigned scan, bool key_down);
 	bool _shift, _ctrl;
 
 	void dsk_reset();
-	byte dsk_read();
-	byte dsk_write();
+	uint8_t dsk_read();
+	uint8_t dsk_write();
 	void dsk_seek();
-	void dsk_select(byte a);
-	byte settrk, setsec, trk, sec;
-	word setdma;
+	void dsk_select(uint8_t a);
+	uint8_t settrk, setsec, trk, sec;
+	uint16_t setdma;
 	Memory &_mem;
 
 	void dsk_led(unsigned colour = 0x0000);
@@ -35,7 +35,7 @@ private:
 	void scr_reset();
 	void scr_clear();
 	void scr_draw(struct font &, char, unsigned, unsigned);
-	void scr_display(byte);
+	void scr_display(uint8_t);
 	bool _esc, _ansi;
 	unsigned _value, _line;
 };

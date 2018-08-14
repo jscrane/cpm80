@@ -1,4 +1,4 @@
-#include <Energia.h>
+#include <Arduino.h>
 #include <SD.h>
 #include <UTFT.h>
 #include <r65emu.h>
@@ -40,24 +40,24 @@ void IO::dsk_seek() {
 	}
 }
 
-byte IO::dsk_read() {
+uint8_t IO::dsk_read() {
 	dsk_led(VGA_RED);
 	dsk_seek();
-	byte buf[128];
+	uint8_t buf[128];
 	int n = drive.read(buf, sizeof(buf));
 	sec++;
-	byte c = (n < 0);
+	uint8_t c = (n < 0);
 	for (int i = 0; i < n; i++)
 		_mem[setdma + i] = buf[i];
 	dsk_led();
 	return c;
 }
 
-byte IO::dsk_write() {
+uint8_t IO::dsk_write() {
 	dsk_led(VGA_BLUE);
 	dsk_seek();
-	byte buf[128];
-	for (int i = 0; i < sizeof(buf); i++)
+	uint8_t buf[128];
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = _mem[setdma + i];
 	int n = drive.write(buf, sizeof(buf));
 	sec++;
@@ -65,7 +65,7 @@ byte IO::dsk_write() {
 	return n < 0;
 }
 
-void IO::dsk_select(byte a) {
+void IO::dsk_select(uint8_t a) {
 	dsk_led(VGA_RED);
 	trk = sec = 0xff;
 	if (drive)

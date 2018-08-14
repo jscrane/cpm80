@@ -1,4 +1,4 @@
-#include <Energia.h>
+#include <Arduino.h>
 #include <UTFT.h>
 #include <r65emu.h>
 #include <ports.h>
@@ -39,11 +39,11 @@ void IO::scr_reset() {
 
 void IO::scr_draw(struct font &f, char ch, unsigned i, unsigned j) {
 	if (screen[j][i] != ch) {
-		const byte *p = f.data + f.w * (ch - f.off);
-		const byte *q = f.data + f.w * (screen[j][i] - f.off);
+		const uint8_t *p = f.data + f.w * (ch - f.off);
+		const uint8_t *q = f.data + f.w * (screen[j][i] - f.off);
 		unsigned x = i * f.w;
 		for (unsigned c = 0; c < f.w; c++) {
-			byte col = *p++, ecol = *q++, d = (col ^ ecol);
+			uint8_t col = *p++, ecol = *q++, d = (col ^ ecol);
 			unsigned y = (j + 1)*f.h;
 			for (unsigned r = 0, b = 0x80; r < f.h; r++, b /= 2) {
 				y--;
@@ -63,9 +63,9 @@ void IO::dsk_led(unsigned colour) {
 	utft.drawPixel(_dx-1, 0);
 }
 
-void IO::scr_display(byte b) {
+void IO::scr_display(uint8_t b) {
 	char ch = (char)b;
-//Serial.println((byte)ch);
+//Serial.println((uint8_t)ch);
 	switch(ch) {
 	case 0x08:		// '\b'
 		scr_draw(f, ' ', c, r);
