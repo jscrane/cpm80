@@ -3,7 +3,7 @@
 
 #include <SPI.h>
 #if defined(USE_UTFT)
-//#include <UTFT.h>
+#include <UTFT.h>
 #elif defined(USE_ESPI)
 #include <TFT_eSPI.h>
 #endif
@@ -80,5 +80,7 @@ void setup(void) {
 void loop(void) {
 	if (!cpu.halted())
 		cpu.run(INSTRUCTIONS);
+#if defined(ESP8266)
 	yield();
+#endif
 }
