@@ -1,9 +1,9 @@
 #include <Arduino.h>
-#include <UTFT.h>
-#include <r65emu.h>
 #include <ports.h>
+#include <memory.h>
+#include <CPU.h>
 #include <i8080.h>
-#include <utftdisplay.h>
+#include <tftdisplay.h>
 
 #include "io.h"
 #include "config.h"
@@ -33,7 +33,7 @@ void IO::scr_reset() {
 	_esc = _ansi = false;
 	_line = _value = 0;
 
-	UTFTDisplay::begin(TFT_BG, TFT_FG);
+	TFTDisplay::begin(TFT_BG, TFT_FG, reverse_landscape);
 	scr_clear();
 }
 
@@ -43,14 +43,14 @@ void IO::scr_draw(struct font &f, char ch, unsigned i, unsigned j) {
 		const uint8_t *q = f.data + f.w * (screen[j][i] - f.off);
 		unsigned x = i * f.w;
 		for (unsigned c = 0; c < f.w; c++) {
-			uint8_t col = *p++, ecol = *q++, d = (col ^ ecol);
+			uint8_t col = pgm_read_byte(p++);
+			uint8_t ecol = pgm_read_byte(q++);
+			uint8_t d = (col ^ ecol);
 			unsigned y = (j + 1)*f.h;
 			for (unsigned r = 0, b = 0x80; r < f.h; r++, b /= 2) {
 				y--;
-				if (d & b) {
-					utft.setColor((col & b)? _fg: _bg);
-					utft.drawPixel(x, y);
-				}
+				if (d & b)
+					drawPixel(x, y, (col & b)? _fg: _bg);
 			}
 			x++;
 		}
@@ -59,13 +59,11 @@ void IO::scr_draw(struct font &f, char ch, unsigned i, unsigned j) {
 }
 
 void IO::dsk_led(unsigned colour) {
-	utft.setColor(colour);
-	utft.drawPixel(_dx-1, 0);
+	drawPixel(_dx-1, 0, colour);
 }
 
 void IO::scr_display(uint8_t b) {
 	char ch = (char)b;
-//Serial.println((uint8_t)ch);
 	switch(ch) {
 	case 0x08:		// '\b'
 		scr_draw(f, ' ', c, r);
@@ -150,7 +148,10 @@ void IO::scr_display(uint8_t b) {
 
 			default:
 				// ???
+//#if defined(DEBUGGING)
+#ifdef notdef
 				Serial.println(ch);
+#endif
 				break;
 			}
 

@@ -1,24 +1,42 @@
-#include <Arduino.h>
+#include <stdint.h>
+#include <hardware.h>
+
+#if defined(USE_SD)
 #include <SD.h>
-#include <UTFT.h>
-#include <r65emu.h>
+#define DISK    SD
+#elif defined(USE_SPIFFS)
+#include <SPIFFS.h>
+#define DISK    SPIFFS
+#elif defined(ESP8266)
+#include <FS.h>
+#endif
+
+#include <sdtape.h>
+#include <checkpoint.h>
+#include <memory.h>
+#include <CPU.h>
 #include <ports.h>
 #include <i8080.h>
+#include <tftdisplay.h>
 
 #include "io.h"
 #include "config.h"
 
 static File drive;
-static char mapping[DRIVES * 13];
-static char *drives[DRIVES];
+static uint8_t mapping[DRIVES * 13];
+static uint8_t *drives[DRIVES];
 
 void IO::dsk_reset() {
 	trk = sec = 0xff;
-	File map = SD.open(PROGRAMS"drivemap.txt", O_READ);
+#if defined(DISK)
+	File map = DISK.open(PROGRAMS"drivemap.txt", O_READ);
+#elif defined(ESP8266)
+	File map = SPIFFS.open(PROGRAMS"drivemap.txt", "r");
+#endif
 	if (map) {
 		int n = map.read(mapping, sizeof(mapping));
 		map.close();
-		char *p = mapping, *q = p;
+		uint8_t *p = mapping, *q = p;
 		for (unsigned i = 0; i < DRIVES; i++) {
 			while (*p != '\n')
 				p++;
@@ -41,7 +59,7 @@ void IO::dsk_seek() {
 }
 
 uint8_t IO::dsk_read() {
-	dsk_led(VGA_RED);
+	dsk_led(RED);
 	dsk_seek();
 	uint8_t buf[128];
 	int n = drive.read(buf, sizeof(buf));
@@ -54,7 +72,7 @@ uint8_t IO::dsk_read() {
 }
 
 uint8_t IO::dsk_write() {
-	dsk_led(VGA_BLUE);
+	dsk_led(BLUE);
 	dsk_seek();
 	uint8_t buf[128];
 	for (unsigned i = 0; i < sizeof(buf); i++)
@@ -66,13 +84,17 @@ uint8_t IO::dsk_write() {
 }
 
 void IO::dsk_select(uint8_t a) {
-	dsk_led(VGA_RED);
+	dsk_led(RED);
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
 	char buf[32];
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
-	drive = SD.open(buf, O_READ | O_WRITE);
+#if defined(DISK)
+	drive = DISK.open(buf, O_READ | O_WRITE);
+#elif defined(ESP8266)
+	drive = SPIFFS.open(buf, "r+");
+#endif
 	if (drive) 
 		dsk_led();
 	else {

@@ -1,9 +1,12 @@
-#include <Arduino.h>
-#include <UTFT.h>
-#include <SD.h>
-#include <r65emu.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <sdtape.h>
+#include <checkpoint.h>
+#include <memory.h>
+#include <CPU.h>
 #include <ports.h>
 #include <i8080.h>
+#include <tftdisplay.h>
 
 #include "io.h"
 

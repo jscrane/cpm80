@@ -1,9 +1,26 @@
 #include <stdarg.h>
-#include <UTFT.h>
-#include <SPI.h>
-#include <SpiRAM.h>
-#include <SD.h>
 #include <r65emu.h>
+
+#include <SPI.h>
+#if defined(USE_UTFT)
+//#include <UTFT.h>
+#elif defined(USE_ESPI)
+#include <TFT_eSPI.h>
+#endif
+
+#if defined(USE_SD)
+#include <SD.h>
+#elif defined(USE_SPIFFS)
+#include <FS.h>
+#include <SPIFFS.h>
+#elif defined(ESP8266)
+#include <FS.h>
+#endif
+
+#if defined(SPIRAM_CS)
+#include <SpiRAM.h>
+#endif
+
 #include <ports.h>
 #include <i8080.h>
 
@@ -14,16 +31,21 @@
 
 IO io(memory);
 i8080 cpu(memory, io);
-ram pages[7];
+
+ram boot[BRAM_PAGES];
+
+#if defined(RAM_PAGES)
+ram pages[RAM_PAGES];
+#endif
 
 void reset(void) {
 	bool sd = hardware_reset();
 
 	unsigned i;
 	for (i = 0; i < sizeof(cpm22); i++)
-		memory[0xe400 + i] = cpm22[i];
+		memory[BRAM_BASE + i] = pgm_read_byte(&cpm22[i]);
 	for (i = 0; i < sizeof(cbios); i++)
-		memory[0xfa00 + i] = cbios[i];
+		memory[0xfa00 + i] = pgm_read_byte(&cbios[i]);
 
 	if (sd)
 		io.reset();
@@ -38,18 +60,25 @@ void reset(void) {
 }
 
 void setup(void) {
+#if defined(DEBUGGING)
 	Serial.begin(115200);
+#endif
 	hardware_init(cpu);
 
-	memory.put(sram, 0x0000, 0xe4);
+	for (unsigned i = 0; i < BRAM_PAGES; i++)
+		memory.put(boot[i], BRAM_BASE + 1024*i);
 
-	for (unsigned i = 0; i < 7; i++)
-		memory.put(pages[i], 0xe400 + 1024*i);
-
+#if defined(SPIRAM_CS)
+	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT);
+#else
+	for (unsigned i = 0; i < RAM_PAGES; i++)
+		memory.put(pages[i], RAM_BASE + 1024*i);
+#endif
 	reset();
 }
 
 void loop(void) {
 	if (!cpu.halted())
 		cpu.run(INSTRUCTIONS);
+	yield();
 }

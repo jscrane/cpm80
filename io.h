@@ -6,7 +6,7 @@ struct font {
 	uint8_t w, h, off;
 };
 
-class IO: public PortDevice<i8080>, public UTFTDisplay {
+class IO: public PortDevice<i8080>, public TFTDisplay {
 public:
 	IO(Memory &mem): _mem(mem) {}
 
