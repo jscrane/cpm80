@@ -1,11 +1,6 @@
 #ifndef __IO_H__
 #define __IO_H__
 
-struct font {
-	const uint8_t *data;
-	uint8_t w, h, off;
-};
-
 class IO: public PortDevice<i8080>, public TFTDisplay {
 public:
 	IO(Memory &mem): _mem(mem) {}
@@ -34,7 +29,7 @@ private:
 
 	void scr_reset();
 	void scr_clear();
-	void scr_draw(struct font &, char, unsigned, unsigned);
+	void scr_draw(char, unsigned, unsigned);
 	void scr_display(uint8_t);
 	bool _esc, _ansi;
 	unsigned _value, _line;
