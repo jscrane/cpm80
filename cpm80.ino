@@ -2,20 +2,6 @@
 #include <r65emu.h>
 
 #include <SPI.h>
-#if defined(USE_UTFT)
-#include <UTFT.h>
-#elif defined(USE_ESPI)
-#include <TFT_eSPI.h>
-#endif
-
-#if defined(USE_SD)
-#include <SD.h>
-#elif defined(USE_SPIFFS)
-#include <FS.h>
-#include <SPIFFS.h>
-#elif defined(ESP8266)
-#include <FS.h>
-#endif
 
 #if defined(SPIRAM_CS)
 #include <SpiRAM.h>
@@ -39,7 +25,7 @@ ram pages[RAM_PAGES];
 #endif
 
 void reset(void) {
-	bool sd = hardware_reset();
+	bool disk = hardware_reset();
 
 	unsigned i;
 	for (i = 0; i < sizeof(cpm22); i++)
@@ -47,10 +33,10 @@ void reset(void) {
 	for (i = 0; i < sizeof(cbios); i++)
 		memory[0xfa00 + i] = pgm_read_byte(&cbios[i]);
 
-	if (sd)
+	if (disk)
 		io.reset();
 	else
-		Serial.println("No SD Card");
+		Serial.println("Disk initialisation failed");
 
 	// set up jump to bios
 	memory[0] = 0xc3;
@@ -80,7 +66,4 @@ void setup(void) {
 void loop(void) {
 	if (!cpu.halted())
 		cpu.run(INSTRUCTIONS);
-#if defined(ESP8266)
-	yield();
-#endif
 }
