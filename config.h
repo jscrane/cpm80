@@ -14,7 +14,7 @@
 #define BRAM_BASE	0xe400
 #define BRAM_PAGES	7
 
-#if defined(SPIRAM_CS)
+#if defined(USE_SPIRAM)
 #define SPIRAM_BASE	0x0000
 #define SPIRAM_EXTENT	BRAM_BASE / 0x100
 #else
