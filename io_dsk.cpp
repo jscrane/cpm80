@@ -5,9 +5,10 @@
 #include <SD.h>
 #define DISK    SD
 #elif defined(USE_SPIFFS)
+#include <FS.h>
 #include <SPIFFS.h>
 #define DISK    SPIFFS
-#elif defined(ESP8266)
+#elif defined(USE_FS)
 #include <FS.h>
 #endif
 
@@ -28,9 +29,11 @@ static uint8_t *drives[DRIVES];
 
 void IO::dsk_reset() {
 	trk = sec = 0xff;
-#if defined(DISK)
+#if defined(USE_SD)
 	File map = DISK.open(PROGRAMS"drivemap.txt", O_READ);
-#elif defined(ESP8266)
+#elif defined(USE_SPIFFS)
+	File map = DISK.open(PROGRAMS"drivemap.txt", FILE_READ);
+#elif defined(USE_FS)
 	File map = SPIFFS.open(PROGRAMS"drivemap.txt", "r");
 #endif
 	if (map) {
@@ -90,9 +93,11 @@ void IO::dsk_select(uint8_t a) {
 		drive.close();
 	char buf[32];
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
-#if defined(DISK)
+#if defined(USE_SD)
 	drive = DISK.open(buf, O_READ | O_WRITE);
-#elif defined(ESP8266)
+#elif defined(USE_SPIFFS)
+	drive = DISK.open(buf, FILE_APPEND);
+#elif defined(USE_FS)
 	drive = SPIFFS.open(buf, "r+");
 #endif
 	if (drive) 
