@@ -4,6 +4,7 @@
 #include <CPU.h>
 #include <i8080.h>
 #include <tftdisplay.h>
+#include <hardware.h>
 
 #include "io.h"
 #include "config.h"
@@ -26,7 +27,7 @@ void IO::scr_reset() {
 	_esc = _ansi = false;
 	_line = _value = 0;
 
-	TFTDisplay::begin(TFT_BG, TFT_FG, reverse_landscape);
+	TFTDisplay::begin(TFT_BG, TFT_FG, TFT_ORIENT);
 	scr_clear();
 }
 

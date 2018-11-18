@@ -27,6 +27,12 @@
 #define TFT_BG	BLACK
 #define TFT_FG	YELLOW
 
+#if defined(USE_UTFT)
+#define TFT_ORIENT	landscape
+#elif defined(USE_ESPI)
+#define TFT_ORIENT	reverse_landscape
+#endif
+
 #define FONT	plain_font
 #define ROWS    30
 #define COLS    64
