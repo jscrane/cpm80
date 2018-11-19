@@ -17,6 +17,9 @@
 #if defined(USE_SPIRAM)
 #define SPIRAM_BASE	0x0000
 #define SPIRAM_EXTENT	BRAM_BASE / 0x100
+#elif defined(ESP32)
+#define RAM_BASE	0x0000
+#define RAM_PAGES	BRAM_BASE / 0x400
 #else
 #define RAM_BASE	0x0000
 #define RAM_PAGES	32
