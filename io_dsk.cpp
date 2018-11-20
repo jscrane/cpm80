@@ -49,18 +49,21 @@ void IO::dsk_reset() {
 		Serial.println("drivemap: open failed");
 }
 
+#define SECLEN	128
+#define SECTRK	26
+
 void IO::dsk_seek() {
 	if (trk != settrk || sec != setsec) {
 		trk = settrk;
 		sec = setsec;
-		drive.seek(128*(26*trk + sec -1));
+		drive.seek(SECLEN*(SECTRK*trk + sec -1));
 	}
 }
 
 uint8_t IO::dsk_read() {
 	dsk_led(RED);
 	dsk_seek();
-	uint8_t buf[128];
+	uint8_t buf[SECLEN];
 	int n = drive.read(buf, sizeof(buf));
 	sec++;
 	uint8_t c = (n < 0);
@@ -73,7 +76,7 @@ uint8_t IO::dsk_read() {
 uint8_t IO::dsk_write() {
 	dsk_led(BLUE);
 	dsk_seek();
-	uint8_t buf[128];
+	uint8_t buf[SECLEN];
 	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = _mem[setdma + i];
 	int n = drive.write(buf, sizeof(buf));

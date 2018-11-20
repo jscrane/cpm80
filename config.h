@@ -3,7 +3,7 @@
 
 // hardwired into BIOS
 // number of entries in drivemap.txt
-#define DRIVES		2
+#define DRIVES		4
 
 #if defined(USE_SD)
 #define PROGRAMS	"/cpm80/"
