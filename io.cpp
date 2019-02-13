@@ -1,7 +1,5 @@
 #include <stdint.h>
 #include <stddef.h>
-#include <sdtape.h>
-#include <checkpoint.h>
 #include <memory.h>
 #include <CPU.h>
 #include <ports.h>
