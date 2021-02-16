@@ -4,6 +4,8 @@
 *.d
 spiffs.img
 data
+*.txt.mk
+.build
 
 # Compiled Object files
 *.slo
