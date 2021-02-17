@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <SPI.h>
+#include <SpiRAM.h>
 
 #include <r65emu.h>
 #include <ports.h>
