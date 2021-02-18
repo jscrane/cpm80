@@ -3,7 +3,7 @@ t ?= esp32
 ifeq ($t, tivac)
 BOARD := EK-LM4F120XL
 CPPFLAGS = -DDEBUGGING -DHARDWARE_H=\"hw/lm4f-utft-sd.h\"
-LIBRARIES = UTFT SD SpiRAM
+LIBRARIES = UTFT SD
 endif
 
 ifeq ($t, esp8266)
