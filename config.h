@@ -11,18 +11,25 @@
 #define PROGRAMS	"/"
 #endif
 
-#define BRAM_BASE	0xe400
-#define BRAM_PAGES	7
+// boot RAM
+// we _must_ have memory above $BRAM_BASE
+#define BRAM_BASE	0xe400u
 
-#if defined(USE_SPIRAM)
-#define SPIRAM_BASE	0x0000
-#define SPIRAM_EXTENT	BRAM_BASE / 0x100
-#elif defined(ESP32)
-#define RAM_BASE	0x0000
-#define RAM_PAGES	BRAM_BASE / 0x400
+#if (SPIRAM_SIZE + RAM_SIZE >= 0x10000u)
+
+// we can fill the entire 64kB address space
+#define RAM_BASE	0x0000u
+#define RAM_PAGES	(RAM_SIZE / ram::page_size)
+#define SPIRAM_BASE	RAM_SIZE
+#define SPIRAM_EXTENT	(0x10000u - RAM_SIZE) / Memory::page_size
 #else
-#define RAM_BASE	0x0000
-#define RAM_PAGES	32
+
+// we need to leave a gap below $BRAM_BASE
+#define BRAM_PAGES	(0x10000 - BRAM_BASE) / ram::page_size
+#define RAM_BASE	0x0000u
+#define RAM_PAGES	(RAM_SIZE / ram::page_size - BRAM_PAGES)
+#define SPIRAM_BASE	RAM_PAGES * ram::page_size
+#define SPIRAM_EXTENT	min(SPIRAM_SIZE, BRAM_BASE - SPIRAM_BASE) / Memory::page_size
 #endif
 
 #define INSTRUCTIONS	1000

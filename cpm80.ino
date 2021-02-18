@@ -14,7 +14,9 @@
 IO io(memory);
 i8080 cpu(memory, io);
 
+#if defined(BRAM_PAGES)
 ram boot[BRAM_PAGES];
+#endif
 
 #if defined(RAM_PAGES)
 ram pages[RAM_PAGES];
@@ -47,15 +49,18 @@ void setup(void) {
 #endif
 	hardware_init(cpu);
 
+#if defined(BRAM_PAGES)
 	for (unsigned i = 0; i < BRAM_PAGES; i++)
 		memory.put(boot[i], BRAM_BASE + 1024*i);
+#endif
 
 #if defined(USE_SPIRAM)
 	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT);
-#else
+#endif
+
 	for (unsigned i = 0; i < RAM_PAGES; i++)
 		memory.put(pages[i], RAM_BASE + 1024*i);
-#endif
+
 	reset();
 }
 
