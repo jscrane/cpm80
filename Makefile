@@ -2,6 +2,7 @@ t ?= esp32
 
 ifeq ($t, tivac)
 BOARD := EK-LM4F120XL
+TERMINAL_SPEED := 115200
 CPPFLAGS = -DDEBUGGING -DHARDWARE_H=\"hw/lm4f-utft-sd.h\"
 LIBRARIES = UTFT SD
 endif
