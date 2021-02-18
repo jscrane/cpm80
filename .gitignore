@@ -6,6 +6,7 @@ spiffs.img
 data
 *.txt.mk
 .build
+.*.swp
 
 # Compiled Object files
 *.slo
