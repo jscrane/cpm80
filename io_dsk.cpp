@@ -26,9 +26,9 @@ static uint8_t *drives[DRIVES];
 void IO::dsk_reset() {
 	trk = sec = 0xff;
 #if defined(USE_SD)
-	File map = SD.open(PROGRAMS"drivemap.txt", O_READ);
+	File map = SD.open(PROGRAMS "drivemap.txt", O_READ);
 #elif defined(USE_SPIFFS) || defined(USE_FS)
-	File map = SPIFFS.open(PROGRAMS"drivemap.txt", "r");
+	File map = SPIFFS.open(PROGRAMS "drivemap.txt", "r");
 #endif
 	if (map) {
 		int n = map.read(mapping, sizeof(mapping));
