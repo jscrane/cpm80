@@ -57,7 +57,7 @@ bool IO::kbd_modifier(unsigned scan, bool is_down) {
 uint8_t IO::kbd_read() {
 	for (;;) {
 		while (!ps2.available())
-			;
+			yield();
 		unsigned scan = ps2.read2();
 		uint8_t key = scan & 0xff;
 		bool down = is_down(scan);
