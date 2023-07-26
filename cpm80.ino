@@ -44,7 +44,7 @@ void reset(void) {
 
 void setup(void) {
 #if defined(DEBUGGING)
-	Serial.begin(115200);
+	Serial.begin(TERMINAL_SPEED);
 #endif
 	hardware_init(cpu);
 

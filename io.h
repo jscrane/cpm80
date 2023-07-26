@@ -1,7 +1,7 @@
 #ifndef __IO_H__
 #define __IO_H__
 
-class IO: public PortDevice<i8080>, public TFTDisplay {
+class IO: public PortDevice<i8080>, public Display {
 public:
 	IO(Memory &mem): _mem(mem) {}
 

@@ -34,13 +34,15 @@
 
 #define INSTRUCTIONS	1000
 
-#define TFT_BG	BLACK
-#define TFT_FG	YELLOW
+#define BG_COLOUR	BLACK
+#define FG_COLOUR	WHITE
 
 #if defined(USE_UTFT)
-#define TFT_ORIENT	landscape
+#define ORIENT	landscape
 #elif defined(USE_ESPI)
-#define TFT_ORIENT	reverse_landscape
+#define ORIENT	reverse_landscape
+#elif defined(USE_VGA)
+#define ORIENT	landscape
 #endif
 
 #define FONT	plain_font
