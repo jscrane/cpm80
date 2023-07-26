@@ -27,7 +27,7 @@ void IO::scr_reset() {
 	_esc = _ansi = false;
 	_line = _value = 0;
 
-	Display::begin(BG_COLOUR, FG_COLOUR, ORIENT);
+	Display::begin(BG_COLOUR, FG_COLOUR, ORIENT, COLS*FONT_W, ROWS*FONT_H);
 	scr_clear();
 }
 
