@@ -45,18 +45,23 @@
 #define ORIENT	landscape
 #endif
 
+#if !defined(FONT)
 #define FONT	plain_font
-#define ROWS    30
-#define COLS    64
+#endif
+
+#if FONT == plain_font
+#define ROWS    	30
+#define COLS    	64
 #define FONT_W		5
 #define FONT_H		8
 #define FONT_OFF	0x20
 
-//#define FONT	tama_font
-//#define ROWS	30
-//#define COLS	80
-//#define FONT_W	4
-//#define FONT_H	8
-//#define FONT_OFF	0x20
+#elif FONT == tama_font
+#define ROWS		30
+#define COLS		80
+#define FONT_W		4
+#define FONT_H		8
+#define FONT_OFF	0x20
+#endif
 
 #endif
