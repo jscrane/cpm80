@@ -3,7 +3,7 @@
 #include <memory.h>
 #include <CPU.h>
 #include <i8080.h>
-#include <tftdisplay.h>
+#include <display.h>
 #include <hardware.h>
 
 #include "io.h"
@@ -27,7 +27,7 @@ void IO::scr_reset() {
 	_esc = _ansi = false;
 	_line = _value = 0;
 
-	TFTDisplay::begin(TFT_BG, TFT_FG, TFT_ORIENT);
+	Display::begin(BG_COLOUR, FG_COLOUR, ORIENT);
 	scr_clear();
 }
 

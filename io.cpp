@@ -4,7 +4,7 @@
 #include <CPU.h>
 #include <ports.h>
 #include <i8080.h>
-#include <tftdisplay.h>
+#include <display.h>
 
 #include "io.h"
 
