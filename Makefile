@@ -11,7 +11,7 @@ endif
 
 ifeq ($t, esp8266)
 BOARD := d1_mini
-UPLOAD_SPEED := 921600
+BAUD := 921600
 FS_DIR := disks
 EESZ := 4M1M
 F_CPU := 80
@@ -22,7 +22,7 @@ LIBRARIES = TFT_eSPI SpiRAM
 endif
 
 ifeq ($t, esp32)
-UPLOAD_SPEED := 921600
+UPLOADSPEED := 921600
 FS_DIR := disks
 LIBRARIES = FS SPIFFS
 TERMINAL_SPEED = 115200
