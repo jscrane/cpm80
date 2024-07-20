@@ -1,20 +1,18 @@
 #ifndef __IO_H__
 #define __IO_H__
 
+class kbd;
+
 class IO: public PortDevice<i8080>, public Display {
 public:
-	IO(Memory &mem): _mem(mem) {}
+	IO(Memory &mem, kbd &kbd): _mem(mem), _kbd(kbd) {}
 
 	uint8_t in(uint16_t p, i8080 *cpu);
 	void out(uint16_t p, uint8_t b, i8080 *cpu);
 
 	void reset();
 private:
-	void kbd_reset();
-	uint8_t kbd_read();
-	uint8_t kbd_avail();
-	bool kbd_modifier(unsigned scan, bool key_down);
-	bool _shift, _ctrl;
+	kbd &_kbd;
 
 	void dsk_reset();
 	uint8_t dsk_read();

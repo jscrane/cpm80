@@ -142,10 +142,7 @@ void IO::scr_display(uint8_t b) {
 
 			default:
 				// ???
-//#if defined(DEBUGGING)
-#ifdef notdef
-				Serial.println(ch);
-#endif
+				DBG(println(ch));
 				break;
 			}
 

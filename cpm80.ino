@@ -6,19 +6,27 @@
 #include <i8080.h>
 
 #include "config.h"
+#include "kbd.h"
+#include "serial_kbd.h"
+#include "ps2_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-IO io(memory);
+#if defined(PS2_KBD)
+ps2kbd kbd;
+#elif defined(SERIAL_KBD)
+serialkbd kbd(Serial);
+#endif
+IO io(memory, kbd);
 i8080 cpu(memory, io);
 
 #if defined(BRAM_PAGES)
-ram boot[BRAM_PAGES];
+ram<> boot[BRAM_PAGES];
 #endif
 
 #if defined(RAM_PAGES)
-ram pages[RAM_PAGES];
+ram<> pages[RAM_PAGES];
 #endif
 
 void reset(void) {
@@ -33,7 +41,7 @@ void reset(void) {
 	if (disk)
 		io.reset();
 	else
-		Serial.println("Disk initialisation failed");
+		Serial.println(F("Disk initialisation failed"));
 
 	// set up jump to bios
 	memory[0] = 0xc3;

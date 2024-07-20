@@ -1,9 +1,9 @@
 #include <Arduino.h>
-#include <r65emu.h>
-#include <ports.h>
-#include <i8080.h>
+#include <keyboard.h>
 #include <ps2drv.h>
-#include "io.h"
+#include <hardware.h>
+#include "kbd.h"
+#include "ps2_kbd.h"
 
 // ascii map for scan-codes
 static const uint8_t scanmap[] = {
@@ -44,7 +44,7 @@ static const uint8_t shiftmap[] = {
 	0xff, 0x2b, 0x33, 0x2d, 0x2a, 0x39, 0xff, 0xff,	 // 0x78
 };
 
-bool IO::kbd_modifier(unsigned scan, bool is_down) {
+bool ps2kbd::modifier(unsigned scan, bool is_down) {
 	if (!Keyboard::isshift(scan) && !Keyboard::isctrl(scan))
 		return false;
 	if (Keyboard::isshift(scan))
@@ -54,7 +54,7 @@ bool IO::kbd_modifier(unsigned scan, bool is_down) {
 	return true;
 }
 
-uint8_t IO::kbd_read() {
+uint8_t ps2kbd::read() {
 	for (;;) {
 		while (!ps2.available()) {
 #if !defined(Energia_h)
@@ -64,7 +64,7 @@ uint8_t IO::kbd_read() {
 		unsigned scan = ps2.read2();
 		uint8_t key = scan & 0xff;
 		bool down = is_down(scan);
-		if (!kbd_modifier(key, down) && !down) {
+		if (!modifier(key, down) && !down) {
 			uint8_t k = (_shift? shiftmap[key]: scanmap[key]);
 			if (k != 0xff) {
 				if (_ctrl)
@@ -75,12 +75,12 @@ uint8_t IO::kbd_read() {
 	}
 }
 
-uint8_t IO::kbd_avail() {
+uint8_t ps2kbd::avail() {
 	while (ps2.available()) {
 		unsigned scan = ps2.peek();
 		uint8_t key = (scan & 0xff);
 		bool down = is_down(scan);
-		if (kbd_modifier(key, down) || !down)
+		if (modifier(key, down) || !down)
 			ps2.read2();
 		else
 			return 0xff;
@@ -88,6 +88,6 @@ uint8_t IO::kbd_avail() {
 	return 0x00;
 }
 
-void IO::kbd_reset() {
+void ps2kbd::reset() {
 	_shift = _ctrl = false;
 }

@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <Arduino.h>
 #include <hardware.h>
 
 #if defined(USE_SD)
@@ -6,8 +6,9 @@
 #elif defined(USE_SPIFFS)
 #include <FS.h>
 #include <SPIFFS.h>
-#elif defined(USE_FS)
+#elif defined(USE_LITTLEFS)
 #include <FS.h>
+#include <LittleFS.h>
 #endif
 
 #include <memory.h>
@@ -27,8 +28,10 @@ void IO::dsk_reset() {
 	trk = sec = 0xff;
 #if defined(USE_SD)
 	File map = SD.open(PROGRAMS "drivemap.txt", O_READ);
-#elif defined(USE_SPIFFS) || defined(USE_FS)
+#elif defined(USE_SPIFFS)
 	File map = SPIFFS.open(PROGRAMS "drivemap.txt", "r");
+#elif defined(USE_LITTLEFS)
+	File map = LittleFS.open(PROGRAMS "drivemap.txt", "r");
 #endif
 	if (map) {
 		int n = map.read(mapping, sizeof(mapping));
@@ -44,7 +47,7 @@ void IO::dsk_reset() {
 				break;
 		}
 	} else
-		Serial.println("drivemap: open failed");
+		Serial.println(F("drivemap: open failed"));
 }
 
 #define SECLEN	128
@@ -92,13 +95,15 @@ void IO::dsk_select(uint8_t a) {
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
 #if defined(USE_SD)
 	drive = SD.open(buf, O_READ | O_WRITE);
-#elif defined(USE_SPIFFS) || defined(USE_FS)
+#elif defined(USE_SPIFFS)
 	drive = SPIFFS.open(buf, "r+");
+#elif defined(USE_LITTLEFS)
+	drive = LittleFS.open(buf, "r+");
 #endif
 	if (drive) 
 		dsk_led();
 	else {
 		Serial.print(buf);
-		Serial.println(": open failed");
+		Serial.println(F(": open failed"));
 	}
 }

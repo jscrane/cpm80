@@ -6,11 +6,12 @@
 #include <i8080.h>
 #include <display.h>
 
+#include "kbd.h"
 #include "io.h"
 
 void IO::reset() {
 	dsk_reset();
-	kbd_reset();
+	_kbd.reset();
 	scr_reset();
 }
 
@@ -18,9 +19,9 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 	uint8_t c = 0;
 	port &= 0xff;
 	if (port == 4)
-		c = kbd_read();
+		c = _kbd.read();
 	else if (port == 2)
-		c = kbd_avail();
+		c = _kbd.avail();
 	else if (port == 14)
 		c = dsk_read();
 	else if (port == 15)

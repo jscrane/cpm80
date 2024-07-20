@@ -3,6 +3,7 @@
 .*.d
 *.d
 spiffs.img
+littlefs.img
 data
 *.txt.mk
 .build
