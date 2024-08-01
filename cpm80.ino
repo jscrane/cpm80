@@ -9,14 +9,21 @@
 #include "kbd.h"
 #include "serial_kbd.h"
 #include "ps2_kbd.h"
+#include "ps2_adv_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-#if defined(PS2_KBD)
+#include <PS2KeyAdvanced.h>
+#include <PS2KeyMap.h>
+
+#if defined(USE_OWN_KBD)
+//serialkbd kbd(Serial);
+PS2KeyAdvanced keyboard;
+PS2KeyMap keymap;
+ps2advkbd kbd;
+#else
 ps2kbd kbd;
-#elif defined(SERIAL_KBD)
-serialkbd kbd(Serial);
 #endif
 IO io(memory, kbd);
 i8080 cpu(memory, io);
@@ -31,6 +38,8 @@ ram<> pages[RAM_PAGES];
 
 void reset(void) {
 	bool disk = hardware_reset();
+
+	kbd.reset();
 
 	unsigned i;
 	for (i = 0; i < sizeof(cpm22); i++)

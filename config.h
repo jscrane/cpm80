@@ -65,6 +65,3 @@
 #endif
 
 #endif
-
-//#define PS2_KBD
-#define SERIAL_KBD
