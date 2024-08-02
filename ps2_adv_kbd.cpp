@@ -14,7 +14,7 @@ PS2KeyMap keymap;
 void ps2advkbd::reset() {
 	keyboard.begin(PS2_KBD_DATA, PS2_KBD_IRQ);
 	keyboard.setNoBreak(1);
-	keymap.selectMap("UK");
+	keymap.selectMap(PS2_ADV_KBD_LAYOUT);
 }
 
 uint8_t ps2advkbd::avail() {
