@@ -1,12 +1,15 @@
 #include <Arduino.h>
+#include "config.h"
+
+#if defined(PS2_ADV_KBD)
 #include <PS2KeyAdvanced.h>
 #include <PS2KeyMap.h>
 #include <hardware.h>
 #include "kbd.h"
 #include "ps2_adv_kbd.h"
 
-extern PS2KeyAdvanced keyboard;
-extern PS2KeyMap keymap;
+PS2KeyAdvanced keyboard;
+PS2KeyMap keymap;
 
 void ps2advkbd::reset() {
 	keyboard.begin(PS2_KBD_DATA, PS2_KBD_IRQ);
@@ -31,4 +34,4 @@ uint8_t ps2advkbd::read() {
 			return code & 0xff;
 	}
 }
-
+#endif

@@ -33,8 +33,7 @@ ifeq ($b, lilygo)
 BOARD := ttgo-t7-v14-mini32
 SERIAL_PORT := /dev/ttyACM0
 CPPFLAGS += -DHARDWARE_H=\"hw/ttgo-t7-v14-mini32.h\" -DUSE_OWN_KBD
-#CPPFLAGS += -DHARDWARE_H=\"hw/ttgo-t7-v14-mini32.h\"
-LIBRARIES += FabGL WiFi
+LIBRARIES += FabGL WiFi PS2KeyAdvanced PS2KeyMap
 
 else
 BOARD := node32s

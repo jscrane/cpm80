@@ -7,24 +7,26 @@
 
 #include "config.h"
 #include "kbd.h"
-#include "serial_kbd.h"
-#include "ps2_kbd.h"
-#include "ps2_adv_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-#include <PS2KeyAdvanced.h>
-#include <PS2KeyMap.h>
-
-#if defined(USE_OWN_KBD)
-//serialkbd kbd(Serial);
-PS2KeyAdvanced keyboard;
-PS2KeyMap keymap;
-ps2advkbd kbd;
-#else
+#if !defined(USE_OWN_KBD)
+#include "ps2_kbd.h"
 ps2kbd kbd;
+
+#elif defined(PS2_ADV_KBD)
+#include "ps2_adv_kbd.h"
+ps2advkbd kbd;
+
+#elif defined(SERIAL_KBD)
+#include "serial_kbd.h"
+serialkbd kbd(Serial);
+
+#else
+#error "No keyboard defined!"
 #endif
+
 IO io(memory, kbd);
 i8080 cpu(memory, io);
 

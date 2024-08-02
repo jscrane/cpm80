@@ -3,7 +3,7 @@
 #include <ps2drv.h>
 #include <hardware.h>
 
-#if defined(USE_PS2_KBD)
+#if !defined(USE_OWN_KBD)
 #include "kbd.h"
 #include "ps2_kbd.h"
 
