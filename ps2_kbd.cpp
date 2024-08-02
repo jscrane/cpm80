@@ -2,6 +2,8 @@
 #include <keyboard.h>
 #include <ps2drv.h>
 #include <hardware.h>
+
+#if !defined(USE_OWN_KBD)
 #include "kbd.h"
 #include "ps2_kbd.h"
 
@@ -91,3 +93,4 @@ uint8_t ps2kbd::avail() {
 void ps2kbd::reset() {
 	_shift = _ctrl = false;
 }
+#endif

@@ -7,17 +7,26 @@
 
 #include "config.h"
 #include "kbd.h"
-#include "serial_kbd.h"
-#include "ps2_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-#if defined(PS2_KBD)
+#if !defined(USE_OWN_KBD)
+#include "ps2_kbd.h"
 ps2kbd kbd;
+
+#elif defined(PS2_ADV_KBD)
+#include "ps2_adv_kbd.h"
+ps2advkbd kbd;
+
 #elif defined(SERIAL_KBD)
+#include "serial_kbd.h"
 serialkbd kbd(Serial);
+
+#else
+#error "No keyboard defined!"
 #endif
+
 IO io(memory, kbd);
 i8080 cpu(memory, io);
 
@@ -31,6 +40,8 @@ ram<> pages[RAM_PAGES];
 
 void reset(void) {
 	bool disk = hardware_reset();
+
+	kbd.reset();
 
 	unsigned i;
 	for (i = 0; i < sizeof(cpm22); i++)

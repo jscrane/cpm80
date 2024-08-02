@@ -64,7 +64,10 @@
 #define FONT_OFF	0x20
 #endif
 
+#if defined(USE_OWN_KBD)
+#define SERIAL_KBD
+//#define PS2_ADV_KBD
+//#define PS2_ADV_KBD_LAYOUT	"UK"
 #endif
 
-//#define PS2_KBD
-#define SERIAL_KBD
+#endif

@@ -1,5 +1,8 @@
 #include <Arduino.h>
 
+#include "config.h"
+
+#if defined(SERIAL_KBD)
 #include "kbd.h"
 #include "serial_kbd.h"
 
@@ -20,3 +23,4 @@ uint8_t serialkbd::avail() {
 void serialkbd::reset() {
 	_serial.begin(TERMINAL_SPEED);
 }
+#endif
