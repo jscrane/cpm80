@@ -29,6 +29,14 @@ uint8_t ps2advkbd::read() {
 #endif
 		}
 		uint16_t key = keyboard.read();
+		if (key & PS2_FUNCTION) {
+			uint8_t k = key & 0xff;
+			if ((k >= PS2_KEY_F1) && (k <= PS2_KEY_F12)) {
+				fnkey(k - 0x60);
+				continue;
+			}
+		}
+
 		uint16_t code = keymap.remapKey(key);
 		if (code > 0)
 			return code & 0xff;

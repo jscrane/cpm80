@@ -1,5 +1,5 @@
-CPM80
-=====
+CP/M-80
+=======
 
 CP/M 8080 hardware emulator on Stellarpad, ESP8266 and ESP32, using [r65emu](jscrane/r65emu).
 
