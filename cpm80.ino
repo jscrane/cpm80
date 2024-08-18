@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <setjmp.h>
 #include <SPI.h>
 
 #include <r65emu.h>
@@ -61,6 +62,15 @@ void reset(void) {
 	cpu.reset();
 }
 
+jmp_buf jb;
+
+void function_key(uint8_t fn) {
+	if (fn == 1) {
+		reset();
+		longjmp(jb, 1);
+	}
+}
+
 void setup(void) {
 #if defined(DEBUGGING)
 	Serial.begin(TERMINAL_SPEED);
@@ -79,10 +89,15 @@ void setup(void) {
 	for (unsigned i = 0; i < RAM_PAGES; i++)
 		memory.put(pages[i], RAM_BASE + 1024*i);
 
+	kbd.register_fnkey_handler(function_key);
+
 	reset();
 }
 
 void loop(void) {
+
+	setjmp(jb);
+
 	if (!cpu.halted())
 		cpu.run(INSTRUCTIONS);
 }
