@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <memory.h>
@@ -6,7 +7,7 @@
 #include <i8080.h>
 #include <display.h>
 
-#include "kbd.h"
+#include "serial_kbd.h"
 #include "io.h"
 
 void IO::reset() {
@@ -19,9 +20,14 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 	uint8_t c = 0;
 	port &= 0xff;
 	if (port == 4)
-		c = _kbd.read();
+		do {
+#if !defined(Energia_h)
+			yield();
+#endif
+			c = _kbd.read();
+		} while (c == 0xff);
 	else if (port == 2)
-		c = _kbd.avail();
+		c = _kbd.available()? 0xff: 0x00;
 	else if (port == 14)
 		c = dsk_read();
 	else if (port == 15)

@@ -7,18 +7,18 @@
 #include <i8080.h>
 
 #include "config.h"
-#include "kbd.h"
+#include "serial_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-#if defined(PS2_ADV_KBD)
-#include "ps2_adv_kbd.h"
-ps2advkbd kbd;
+#if defined(PS2_SERIAL_KBD)
+#include "ps2_serial_kbd.h"
+ps2_serial_kbd kbd;
 
-#elif defined(SERIAL_KBD)
-#include "serial_kbd.h"
-serialkbd kbd(Serial);
+#elif defined(HW_SERIAL_KBD)
+#include "hw_serial_kbd.h"
+hw_serial_kbd kbd(Serial);
 
 #else
 #error "No keyboard defined!"

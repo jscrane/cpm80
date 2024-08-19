@@ -65,9 +65,9 @@
 #endif
 
 #if defined(USE_OWN_KBD)
-#define SERIAL_KBD
-//#define PS2_ADV_KBD
-//#define PS2_ADV_KBD_LAYOUT	"UK"
+//#define HW_SERIAL_KBD
+#define PS2_SERIAL_KBD
+#define PS2_SERIAL_KBD_LAYOUT	"UK"
 #endif
 
 #endif
