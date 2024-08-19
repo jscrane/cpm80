@@ -7,7 +7,6 @@
 #include <i8080.h>
 
 #include "config.h"
-#include "serial_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
