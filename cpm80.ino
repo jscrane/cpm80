@@ -12,11 +12,9 @@
 #include "roms/cbios.h"
 
 #if defined(PS2_SERIAL_KBD)
-#include "ps2_serial_kbd.h"
 ps2_serial_kbd kbd;
 
 #elif defined(HW_SERIAL_KBD)
-#include "hw_serial_kbd.h"
 hw_serial_kbd kbd(Serial);
 
 #else
