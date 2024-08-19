@@ -12,11 +12,7 @@
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
-#if !defined(USE_OWN_KBD)
-#include "ps2_kbd.h"
-ps2kbd kbd;
-
-#elif defined(PS2_ADV_KBD)
+#if defined(PS2_ADV_KBD)
 #include "ps2_adv_kbd.h"
 ps2advkbd kbd;
 
