@@ -32,8 +32,6 @@
 #define SPIRAM_EXTENT	min(SPIRAM_SIZE, BRAM_BASE - SPIRAM_BASE) / Memory::page_size
 #endif
 
-#define INSTRUCTIONS	1000
-
 #define BG_COLOUR	BLACK
 #define FG_COLOUR	WHITE
 

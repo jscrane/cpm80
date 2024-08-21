@@ -60,9 +60,6 @@ void function_key(uint8_t fn) {
 }
 
 void setup(void) {
-#if defined(DEBUGGING)
-	Serial.begin(TERMINAL_SPEED);
-#endif
 	hardware_init(cpu);
 
 #if defined(BRAM_PAGES)
@@ -84,6 +81,5 @@ void setup(void) {
 
 void loop(void) {
 
-	if (!cpu.halted())
-		cpu.run(INSTRUCTIONS);
+	hardware_run();
 }
