@@ -1,5 +1,4 @@
 #include <stdarg.h>
-#include <setjmp.h>
 #include <SPI.h>
 
 #include <r65emu.h>
@@ -55,13 +54,9 @@ void reset(void) {
 	cpu.reset();
 }
 
-jmp_buf jb;
-
 void function_key(uint8_t fn) {
-	if (fn == 1) {
+	if (fn == 1)
 		reset();
-		longjmp(jb, 1);
-	}
 }
 
 void setup(void) {
@@ -88,8 +83,6 @@ void setup(void) {
 }
 
 void loop(void) {
-
-	setjmp(jb);
 
 	if (!cpu.halted())
 		cpu.run(INSTRUCTIONS);
