@@ -32,8 +32,6 @@
 #define SPIRAM_EXTENT	min(SPIRAM_SIZE, BRAM_BASE - SPIRAM_BASE) / Memory::page_size
 #endif
 
-#define INSTRUCTIONS	1000
-
 #define BG_COLOUR	BLACK
 #define FG_COLOUR	WHITE
 
@@ -62,12 +60,6 @@
 #define FONT_W		4
 #define FONT_H		8
 #define FONT_OFF	0x20
-#endif
-
-#if defined(USE_OWN_KBD)
-//#define HW_SERIAL_KBD
-#define PS2_SERIAL_KBD
-#define PS2_SERIAL_KBD_LAYOUT	"UK"
 #endif
 
 #endif

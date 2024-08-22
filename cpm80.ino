@@ -1,5 +1,4 @@
 #include <stdarg.h>
-#include <setjmp.h>
 #include <SPI.h>
 
 #include <r65emu.h>
@@ -7,17 +6,14 @@
 #include <i8080.h>
 
 #include "config.h"
-#include "serial_kbd.h"
 #include "io.h"
 #include "roms/cpm22.h"
 #include "roms/cbios.h"
 
 #if defined(PS2_SERIAL_KBD)
-#include "ps2_serial_kbd.h"
 ps2_serial_kbd kbd;
 
 #elif defined(HW_SERIAL_KBD)
-#include "hw_serial_kbd.h"
 hw_serial_kbd kbd(Serial);
 
 #else
@@ -58,19 +54,12 @@ void reset(void) {
 	cpu.reset();
 }
 
-jmp_buf jb;
-
 void function_key(uint8_t fn) {
-	if (fn == 1) {
+	if (fn == 1)
 		reset();
-		longjmp(jb, 1);
-	}
 }
 
 void setup(void) {
-#if defined(DEBUGGING)
-	Serial.begin(TERMINAL_SPEED);
-#endif
 	hardware_init(cpu);
 
 #if defined(BRAM_PAGES)
@@ -92,8 +81,5 @@ void setup(void) {
 
 void loop(void) {
 
-	setjmp(jb);
-
-	if (!cpu.halted())
-		cpu.run(INSTRUCTIONS);
+	hardware_run();
 }

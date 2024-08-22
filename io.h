@@ -13,6 +13,8 @@ public:
 	void reset();
 private:
 	serial_kbd &_kbd;
+	bool _brk;
+	uint8_t kbd_poll();
 
 	void dsk_reset();
 	uint8_t dsk_read();

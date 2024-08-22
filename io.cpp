@@ -14,18 +14,26 @@ void IO::reset() {
 	dsk_reset();
 	_kbd.reset();
 	scr_reset();
+	_brk = true;
+}
+
+uint8_t IO::kbd_poll() {
+	uint8_t c;
+	do {
+#if !defined(Energia_h)
+		yield();
+#endif
+		c = _kbd.read();
+	} while (c == 0xff && !_brk);
+	_brk = false;
+	return c;
 }
 
 uint8_t IO::in(uint16_t port, i8080 *cpu) {
 	uint8_t c = 0;
 	port &= 0xff;
 	if (port == 4)
-		do {
-#if !defined(Energia_h)
-			yield();
-#endif
-			c = _kbd.read();
-		} while (c == 0xff);
+		c = kbd_poll();
 	else if (port == 2)
 		c = _kbd.available()? 0xff: 0x00;
 	else if (port == 14)
