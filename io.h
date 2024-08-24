@@ -3,6 +3,19 @@
 
 class serial_kbd;
 
+// input ports (see CBIOS.ASM)
+#define CON_ST	2
+#define CON_IN	4
+#define FDC_IN	14
+#define FDC_OUT	15
+
+// output ports
+#define CON_OUT		4
+#define FDC_SELDSK	20
+#define FDC_SETTRK	21
+#define FDC_SETSEC	22
+#define FDC_SETDMA	23
+
 class IO: public PortDevice<i8080>, public Display {
 public:
 	IO(Memory &mem, serial_kbd &kbd): _mem(mem), _kbd(kbd) {}

@@ -34,7 +34,7 @@ ram<> pages[RAM_PAGES];
 void reset(void) {
 	bool disk = hardware_reset();
 
-	kbd.reset();
+	io.reset();
 
 	unsigned i;
 	for (i = 0; i < sizeof(cpm22); i++)
@@ -57,6 +57,8 @@ void reset(void) {
 void function_key(uint8_t fn) {
 	if (fn == 1)
 		reset();
+	else if (fn == 10)
+		hardware_debug_cpu();
 }
 
 void setup(void) {

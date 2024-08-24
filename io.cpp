@@ -12,9 +12,9 @@
 #include "io.h"
 
 void IO::reset() {
-	dsk_reset();
 	_kbd.reset();
 	scr_reset();
+	dsk_reset();
 	_brk = true;
 }
 
@@ -33,13 +33,13 @@ uint8_t IO::kbd_poll() {
 uint8_t IO::in(uint16_t port, i8080 *cpu) {
 
 	switch(port & 0xff) {
-	case 4:
-		return kbd_poll();
-	case 2:
+	case CON_ST:
 		return _kbd.available()? 0xff: 0x00;
-	case 14:
+	case CON_IN:
+		return kbd_poll();
+	case FDC_IN:
 		return dsk_read();
-	case 15:
+	case FDC_OUT:
 		return dsk_write();
 	default:
 		DBG(printf("IO: unhandled input port: %x\r\n", port));
@@ -50,19 +50,19 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 void IO::out(uint16_t port, uint8_t a, i8080 *cpu) {
 
 	switch(port & 0xff) {
-	case 4:
+	case CON_OUT:
 		scr_display(a);
 		break;
-	case 20:
+	case FDC_SELDSK:
 		dsk_select(a);
 		break;
-	case 21:
+	case FDC_SETTRK:
 		settrk = a;
 		break;
-	case 22:
+	case FDC_SETSEC:
 		setsec = a;
 		break;
-	case 23:
+	case FDC_SETDMA:
 		setdma = cpu->hl();
 		break;
 	default:
