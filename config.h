@@ -1,9 +1,14 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-// hardwired into BIOS
 // number of entries in drivemap.txt
+// hardwired into BIOS:
+// ;       fixed data tables for four-drive standard
+// ;       ibm-compatible 8" disks
+
 #define DRIVES		4
+#define SECLEN		128
+#define SECTRK		26
 
 #if defined(USE_SD)
 #define PROGRAMS	"/cpm80/"
@@ -11,9 +16,11 @@
 #define PROGRAMS	"/"
 #endif
 
-// boot RAM
+// boot RAM (cpm and cbios)
 // we _must_ have memory above $BRAM_BASE
 #define BRAM_BASE	0xe400u
+#define CPM_BASE	BRAM_BASE
+#define CBIOS_BASE	0xfa00u
 
 #if (SPIRAM_SIZE + RAM_SIZE >= 0x10000u)
 

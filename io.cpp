@@ -6,6 +6,7 @@
 #include <ports.h>
 #include <i8080.h>
 #include <display.h>
+#include <hardware.h>
 
 #include "serial_kbd.h"
 #include "io.h"
@@ -30,29 +31,41 @@ uint8_t IO::kbd_poll() {
 }
 
 uint8_t IO::in(uint16_t port, i8080 *cpu) {
-	uint8_t c = 0;
-	port &= 0xff;
-	if (port == 4)
-		c = kbd_poll();
-	else if (port == 2)
-		c = _kbd.available()? 0xff: 0x00;
-	else if (port == 14)
-		c = dsk_read();
-	else if (port == 15)
-		c = dsk_write();
-	return c;
+
+	switch(port & 0xff) {
+	case 4:
+		return kbd_poll();
+	case 2:
+		return _kbd.available()? 0xff: 0x00;
+	case 14:
+		return dsk_read();
+	case 15:
+		return dsk_write();
+	default:
+		DBG(printf("IO: unhandled input port: %x\r\n", port));
+	}
+	return 0x00;
 }
 
 void IO::out(uint16_t port, uint8_t a, i8080 *cpu) {
-	port &= 0xff;
-	if (port == 4)
+
+	switch(port & 0xff) {
+	case 4:
 		scr_display(a);
-	else if (port == 20)
+		break;
+	case 20:
 		dsk_select(a);
-	else if (port == 21)
+		break;
+	case 21:
 		settrk = a;
-	else if (port == 22)
+		break;
+	case 22:
 		setsec = a;
-	else if (port == 23)
+		break;
+	case 23:
 		setdma = cpu->hl();
+		break;
+	default:
+		DBG(printf("IO: unhandled output port: %x\r\n", port));
+	}
 }
