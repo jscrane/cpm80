@@ -50,9 +50,6 @@ void IO::dsk_reset() {
 		Serial.println(F("drivemap: open failed"));
 }
 
-#define SECLEN	128
-#define SECTRK	26
-
 void IO::dsk_seek() {
 	if (trk != settrk || sec != setsec) {
 		trk = settrk;

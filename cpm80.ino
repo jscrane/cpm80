@@ -38,9 +38,9 @@ void reset(void) {
 
 	unsigned i;
 	for (i = 0; i < sizeof(cpm22); i++)
-		memory[BRAM_BASE + i] = pgm_read_byte(&cpm22[i]);
+		memory[CPM_BASE + i] = pgm_read_byte(&cpm22[i]);
 	for (i = 0; i < sizeof(cbios); i++)
-		memory[0xfa00 + i] = pgm_read_byte(&cbios[i]);
+		memory[CBIOS_BASE + i] = pgm_read_byte(&cbios[i]);
 
 	if (disk)
 		io.reset();
@@ -49,8 +49,8 @@ void reset(void) {
 
 	// set up jump to bios
 	memory[0] = 0xc3;
-	memory[1] = 0x00;
-	memory[2] = 0xfa;
+	memory[1] = (CBIOS_BASE & 0xff);
+	memory[2] = ((CBIOS_BASE & 0xff00) >> 8);
 	cpu.reset();
 }
 
