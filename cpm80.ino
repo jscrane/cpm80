@@ -34,23 +34,11 @@ ram<> pages[RAM_PAGES];
 void reset(void) {
 	bool disk = hardware_reset();
 
-	io.reset();
-
-	unsigned i;
-	for (i = 0; i < sizeof(cpm22); i++)
-		memory[CPM_BASE + i] = pgm_read_byte(&cpm22[i]);
-	for (i = 0; i < sizeof(cbios); i++)
-		memory[CBIOS_BASE + i] = pgm_read_byte(&cbios[i]);
-
 	if (disk)
 		io.reset();
 	else
 		Serial.println(F("Disk initialisation failed"));
 
-	// set up jump to bios
-	memory[0] = 0xc3;
-	memory[1] = (CBIOS_BASE & 0xff);
-	memory[2] = ((CBIOS_BASE & 0xff00) >> 8);
 	cpu.reset();
 }
 

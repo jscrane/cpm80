@@ -42,7 +42,7 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 	case FDC_OUT:
 		return dsk_write();
 	default:
-		DBG(printf("IO: unhandled input port: %x\r\n", port));
+		DBG(printf("IO: unhandled input port: %u\r\n", port));
 	}
 	return 0x00;
 }
@@ -66,6 +66,6 @@ void IO::out(uint16_t port, uint8_t a, i8080 *cpu) {
 		setdma = cpu->hl();
 		break;
 	default:
-		DBG(printf("IO: unhandled output port: %x\r\n", port));
+		DBG(printf("IO: unhandled output port: %u\r\n", port));
 	}
 }

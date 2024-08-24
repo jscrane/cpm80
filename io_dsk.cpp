@@ -46,6 +46,14 @@ void IO::dsk_reset() {
 			if (p - mapping >= n)
 				break;
 		}
+
+		// read boot sector
+		settrk = 0;
+		setsec = 1;
+		setdma = 0;
+		dsk_select(0);
+		dsk_seek();
+		dsk_read();
 	} else
 		Serial.println(F("drivemap: open failed"));
 }
