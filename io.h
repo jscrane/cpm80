@@ -3,18 +3,31 @@
 
 class serial_kbd;
 
-// input ports (see CBIOS.ASM)
-#define CON_ST	2
-#define CON_IN	4
-#define FDC_IN	14
-#define FDC_OUT	15
+// input ports: A = IN(n)
+// (see https://st.sdf-eu.org/i8080/index.html)
+#define CON_ST		0
+#define CON_IN		1
+#define FDC_IODONE	13
+#define FDC_STATUS	14
 
-// output ports
-#define CON_OUT		4
-#define FDC_SELDSK	20
-#define FDC_SETTRK	21
-#define FDC_SETSEC	22
-#define FDC_SETDMA	23
+// output ports: OUT(n, A)
+#define CON_OUT		1
+#define FDC_SELDSK	10
+#define FDC_SETTRK	11
+#define FDC_SETSEC	12
+#define FDC_IO		13
+#define FDC_SETDMA_L	15
+#define FDC_SETDMA_H	16
+
+// disk errors
+#define OK		0
+#define ILLEGAL_DRIVE	1
+#define ILLEGAL_TRACK	2
+#define ILLEGAL_SECTOR	3
+#define SEEK_ERROR	4
+#define READ_ERROR	5
+#define WRITE_ERROR	6
+#define ILLEGAL_CMD	7
 
 class IO: public PortDevice<i8080>, public Display {
 public:
@@ -32,10 +45,13 @@ private:
 	void dsk_reset();
 	uint8_t dsk_read();
 	uint8_t dsk_write();
-	void dsk_seek();
-	void dsk_select(uint8_t a);
+	bool dsk_seek();
+	uint8_t dsk_select(uint8_t a);
+	uint8_t dsk_settrk(uint8_t a);
+	uint8_t dsk_setsec(uint8_t a);
 	uint8_t settrk, setsec, trk, sec;
 	uint16_t setdma;
+	uint8_t dsk_status;
 	Memory &_mem;
 
 	void dsk_led(unsigned colour = 0x0000);

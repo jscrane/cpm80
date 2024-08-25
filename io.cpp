@@ -37,12 +37,13 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 		return _kbd.available()? 0xff: 0x00;
 	case CON_IN:
 		return kbd_poll();
-	case FDC_IN:
-		return dsk_read();
-	case FDC_OUT:
-		return dsk_write();
+	case FDC_STATUS:
+		return dsk_status;
+	case FDC_IODONE:
+		return 1;
 	default:
-		DBG(printf("IO: unhandled input port: %u\r\n", port));
+		DBG(printf("IO: unhandled IN(%u)\r\n", port));
+		break;
 	}
 	return 0x00;
 }
@@ -50,22 +51,31 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 void IO::out(uint16_t port, uint8_t a, i8080 *cpu) {
 
 	switch(port & 0xff) {
+	case FDC_SELDSK:
+		dsk_status = dsk_select(a);
+		break;
+	case FDC_SETTRK:
+		dsk_status = dsk_settrk(a);
+		break;
+	case FDC_SETSEC:
+		dsk_status = dsk_setsec(a);
+		break;
+	case FDC_SETDMA_L:
+		setdma = a;
+		dsk_status = OK;
+		break;
+	case FDC_SETDMA_H:
+		setdma |= (a << 8);
+		dsk_status = OK;
+		break;
+	case FDC_IO:
+		dsk_status = (a? dsk_write(): dsk_read());
+		break;
 	case CON_OUT:
 		scr_display(a);
 		break;
-	case FDC_SELDSK:
-		dsk_select(a);
-		break;
-	case FDC_SETTRK:
-		settrk = a;
-		break;
-	case FDC_SETSEC:
-		setsec = a;
-		break;
-	case FDC_SETDMA:
-		setdma = cpu->hl();
-		break;
 	default:
-		DBG(printf("IO: unhandled output port: %u\r\n", port));
+		DBG(printf("IO: unhandled OUT(%u)\r\n", port));
+		break;
 	}
 }

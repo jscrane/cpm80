@@ -7,8 +7,6 @@
 
 #include "config.h"
 #include "io.h"
-#include "roms/cpm22.h"
-#include "roms/cbios.h"
 
 #if defined(PS2_SERIAL_KBD)
 ps2_serial_kbd kbd;
@@ -37,7 +35,7 @@ void reset(void) {
 	if (disk)
 		io.reset();
 	else
-		Serial.println(F("Disk initialisation failed"));
+		DBG(println(F("Disk initialisation failed")));
 
 	cpu.reset();
 }

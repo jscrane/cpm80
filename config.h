@@ -7,6 +7,7 @@
 // ;       ibm-compatible 8" disks
 
 #define DRIVES		4
+#define TRACKS		77
 #define SECLEN		128
 #define SECTRK		26
 
