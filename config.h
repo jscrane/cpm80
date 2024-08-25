@@ -56,15 +56,23 @@
 #endif
 
 #if FONT == plain_font
+#if !defined(ROWS)
 #define ROWS    	30
+#endif
+#if !defined(COLS)
 #define COLS    	64
+#endif
 #define FONT_W		5
 #define FONT_H		8
 #define FONT_OFF	0x20
 
 #elif FONT == tama_font
+#if !defined(ROWS)
 #define ROWS		30
+#endif
+#if !defined(COLS)
 #define COLS		80
+#endif
 #define FONT_W		4
 #define FONT_H		8
 #define FONT_OFF	0x20
