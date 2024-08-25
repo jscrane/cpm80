@@ -39,21 +39,39 @@ Edit ```disks/drivemap.txt``` to assign the new disk to a drive.
 
 Use of SD card storage is recommended where possible.
 
-Building CP/M
--------------
-The current system is a "CP/M in ROM".
+CP/M in ROM
+-----------
+A previous system was a "CP/M in ROM".
 
-Two files are involved (see the directory [images](images)):
+This consisted of two files (see the directory [system](system)):
 - ```CBIOS.ASM``` the "skeletal CBIOS" from Appendix B of the
   [CP/M 2.2 manual](http://www.gaby.de/cpm/manuals/archive/cpm22htm/)
 - ```CPM22.ASM``` CP/M 2.2 itself, from [here](http://cpuville.com/Code/cpm22_asm.txt)
 
-Each of these was assembled to corresponding ```.bin``` files by [asm8080](https://sourceforge.net/p/asm8080/)
-and from there to ```.h``` files by [makerom](https://github.com/jscrane/emul8/tree/master/util):
+Each of these was assembled to its corresponding ```.bin``` file by [asm8080](https://sourceforge.net/p/asm8080/)
+and from there to ```.h``` by [makerom](https://github.com/jscrane/emul8/tree/master/util):
 
 ```
-$ asm8080 images/CPM22.ASM
-$ makerom -bp images/CPM22.h cpm22 > roms/cpm22.h
+$ asm8080 CPM22.ASM
+$ makerom -bp CPM22.h cpm22 > cpm22.h
 ```
 
-The ROMs are loaded at addresses ```0xe400``` (cpm22) and ```0xfa00``` (cbios), leaving 57kB free.
+The ROMs were loaded at addresses ```0xe400``` (cpm22) and ```0xfa00``` (cbios), leaving 57kB free.
+
+Booting CP/M from disk
+----------------------
+
+The current system loads CP/M from disk, as nature intended. The boot disk ```cpma.cpm``` comes
+from the excellent [emu8080](https://st.sdf-eu.org/i8080/index.html).
+
+A modified 8080 port-mapping supports the BIOS found on this disk (see ```io.cpp```). The file
+```system/bios8080.asm``` (from [z80pack](https://github.com/udo-munk/z80pack/tree/master/cpmsim/srccpm2)) 
+is compatible with this port-mapping scheme --- it's a near ancestor of the BIOS in _emu8080_.
+
+The system tracks for this are broken out into ```system/system.bin```. This can be used to create
+bootable disk-images as follows:
+
+```
+$ mkfs.cpm -b system.bin foo.cpm
+```
+
