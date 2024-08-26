@@ -3,9 +3,9 @@
 
 #include <r65emu.h>
 #include <ports.h>
-#include <i8080.h>
 
 #include "config.h"
+#include PROCESSOR_H
 #include "io.h"
 
 #if defined(PS2_SERIAL_KBD)
@@ -19,7 +19,7 @@ hw_serial_kbd kbd(Serial);
 #endif
 
 IO io(memory, kbd);
-i8080 cpu(memory, io);
+processor_t cpu(memory, io);
 
 #if defined(BRAM_PAGES)
 ram<> boot[BRAM_PAGES];

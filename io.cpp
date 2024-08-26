@@ -4,10 +4,11 @@
 #include <memory.h>
 #include <CPU.h>
 #include <ports.h>
-#include <i8080.h>
 #include <display.h>
 #include <hardware.h>
 
+#include "config.h"
+#include PROCESSOR_H
 #include "serial_kbd.h"
 #include "io.h"
 
@@ -30,7 +31,7 @@ uint8_t IO::kbd_poll() {
 	return c;
 }
 
-uint8_t IO::in(uint16_t port, i8080 *cpu) {
+uint8_t IO::in(uint16_t port, processor_t *cpu) {
 
 	switch(port & 0xff) {
 	case CON_ST:
@@ -48,7 +49,7 @@ uint8_t IO::in(uint16_t port, i8080 *cpu) {
 	return 0x00;
 }
 
-void IO::out(uint16_t port, uint8_t a, i8080 *cpu) {
+void IO::out(uint16_t port, uint8_t a, processor_t *cpu) {
 
 	switch(port & 0xff) {
 	case FDC_SELDSK:

@@ -2,12 +2,12 @@
 #include <ports.h>
 #include <memory.h>
 #include <CPU.h>
-#include <i8080.h>
 #include <display.h>
 #include <hardware.h>
 
-#include "io.h"
 #include "config.h"
+#include PROCESSOR_H
+#include "io.h"
 
 #include "plain_font.h"
 #include "tama_mini02_font.h"

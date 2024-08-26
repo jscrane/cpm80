@@ -14,11 +14,11 @@
 #include <memory.h>
 #include <CPU.h>
 #include <ports.h>
-#include <i8080.h>
 #include <display.h>
 
-#include "io.h"
 #include "config.h"
+#include PROCESSOR_H
+#include "io.h"
 
 static File drive;
 static uint8_t mapping[DRIVES * 13];

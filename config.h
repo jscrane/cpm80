@@ -17,6 +17,14 @@
 #define PROGRAMS	"/"
 #endif
 
+#if defined(USE_Z80)
+#define PROCESSOR_H	"z80.h"
+typedef class z80 processor_t;
+#else
+#define PROCESSOR_H	"i8080.h"
+typedef class i8080 processor_t;
+#endif
+
 // boot RAM (cpm and cbios)
 // we _must_ have memory above $BRAM_BASE
 #define BRAM_BASE	0xe400u

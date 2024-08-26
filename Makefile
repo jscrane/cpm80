@@ -32,7 +32,7 @@ TERMINAL_SPEED = 115200
 ifeq ($b, lilygo)
 BOARD := ttgo-t7-v14-mini32
 SERIAL_PORT := /dev/ttyACM0
-CPPFLAGS += -DHARDWARE_H=\"hw/ttgo-t7-v14-mini32.h\" -DROWS=32 -DCOLS=80
+CPPFLAGS += -DHARDWARE_H=\"hw/ttgo-t7-v14-mini32.h\" -DROWS=32 -DCOLS=80 -DUSE_Z80
 LIBRARIES += FabGL WiFi
 
 else
