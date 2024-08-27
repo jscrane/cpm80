@@ -21,7 +21,7 @@ void screen::clear() {
 	for (int j = 0; j < ROWS; j++)
 		for (int i = 0; i < COLS; i++)
 			buf[j][i] = ' ';
-	clear();
+	Display::clear();
 }
 
 void screen::reset() {
@@ -54,7 +54,6 @@ void screen::draw(char ch, unsigned i, unsigned j) {
 }
 
 void screen::write(uint8_t b) {
-	Serial.print(b);
 	char ch = (char)b;
 	switch(ch) {
 	case 0x08:		// '\b'
