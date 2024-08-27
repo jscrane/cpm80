@@ -19,7 +19,16 @@ hw_serial_kbd kbd(Serial);
 #error "No keyboard defined!"
 #endif
 
+#if defined(SCR_SERIAL_DSP)
 screen dsp;
+
+#elif defined(HW_SERIAL_DSP)
+hw_serial_dsp dsp(Serial);
+
+#else
+#error "No display defined!"
+#endif
+
 IO io(memory, kbd, dsp);
 processor_t cpu(memory, io);
 
