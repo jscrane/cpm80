@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include PROCESSOR_H
+#include "screen.h"
 #include "io.h"
 
 #if defined(PS2_SERIAL_KBD)
@@ -18,7 +19,8 @@ hw_serial_kbd kbd(Serial);
 #error "No keyboard defined!"
 #endif
 
-IO io(memory, kbd);
+screen dsp;
+IO io(memory, kbd, dsp);
 processor_t cpu(memory, io);
 
 #if defined(BRAM_PAGES)

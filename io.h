@@ -31,7 +31,7 @@ class serial_kbd;
 
 class IO: public PortDevice, public Display {
 public:
-	IO(Memory &mem, serial_kbd &kbd): _mem(mem), _kbd(kbd) {}
+	IO(Memory &mem, serial_kbd &kbd, serial_dsp &dsp): _mem(mem), _kbd(kbd), _dsp(dsp) {}
 
 	uint8_t in(uint16_t p);
 	void out(uint16_t p, uint8_t b);
@@ -54,14 +54,7 @@ private:
 	uint8_t dsk_status;
 	Memory &_mem;
 
-	void dsk_led(unsigned colour = 0x0000);
-
-	void scr_reset();
-	void scr_clear();
-	void scr_draw(char, unsigned, unsigned);
-	void scr_display(uint8_t);
-	bool _esc, _ansi;
-	unsigned _value, _line;
+	serial_dsp &_dsp;
 };
 
 #endif

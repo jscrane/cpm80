@@ -15,9 +15,9 @@
 #include <CPU.h>
 #include <ports.h>
 #include <display.h>
+#include <serial_dsp.h>
 
 #include "config.h"
-#include PROCESSOR_H
 #include "io.h"
 
 static File drive;
@@ -72,46 +72,32 @@ bool IO::dsk_seek() {
 
 uint8_t IO::dsk_read() {
 
-	dsk_led(RED);
-
-	if (!dsk_seek()) {
-		dsk_led();
+	if (!dsk_seek())
 		return SEEK_ERROR;
-	}
 
 	uint8_t buf[SECLEN];
 	int n = drive.read(buf, sizeof(buf));
-	if (n < 0) {
-		dsk_led();
+	if (n < 0)
 		return READ_ERROR;
-	}
 
 	for (int i = 0; i < n; i++)
 		_mem[setdma + i] = buf[i];
 	sec++;
-	dsk_led();
 	return OK;
 }
 
 uint8_t IO::dsk_write() {
 
-	dsk_led(BLUE);
-
-	if (!dsk_seek()) {
-		dsk_led();
+	if (!dsk_seek())
 		return SEEK_ERROR;
-	}
 
 	uint8_t buf[SECLEN];
 	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = _mem[setdma + i];
 	int n = drive.write(buf, sizeof(buf));
-	if (n < 0) {
-		dsk_led();
+	if (n < 0)
 		return WRITE_ERROR;
-	}
 	sec++;
-	dsk_led();
 	return OK;
 }
 
@@ -122,7 +108,6 @@ uint8_t IO::dsk_select(uint8_t a) {
 		return ILLEGAL_DRIVE;
 	}
 
-	dsk_led(RED);
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
@@ -135,8 +120,6 @@ uint8_t IO::dsk_select(uint8_t a) {
 #elif defined(USE_LITTLEFS)
 	drive = LittleFS.open(buf, "r+");
 #endif
-	dsk_led();
-
 	if (!drive) {
 		DBG(print(buf));
 		DBG(println(F(": open failed")));
