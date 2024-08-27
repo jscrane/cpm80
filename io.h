@@ -29,12 +29,12 @@ class serial_kbd;
 #define WRITE_ERROR	6
 #define ILLEGAL_CMD	7
 
-class IO: public PortDevice<processor_t>, public Display {
+class IO: public PortDevice, public Display {
 public:
 	IO(Memory &mem, serial_kbd &kbd): _mem(mem), _kbd(kbd) {}
 
-	uint8_t in(uint16_t p, processor_t *cpu);
-	void out(uint16_t p, uint8_t b, processor_t *cpu);
+	uint8_t in(uint16_t p);
+	void out(uint16_t p, uint8_t b);
 
 	void reset();
 private:

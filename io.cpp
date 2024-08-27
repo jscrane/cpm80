@@ -31,7 +31,7 @@ uint8_t IO::kbd_poll() {
 	return c;
 }
 
-uint8_t IO::in(uint16_t port, processor_t *cpu) {
+uint8_t IO::in(uint16_t port) {
 
 	switch(port & 0xff) {
 	case CON_ST:
@@ -49,7 +49,7 @@ uint8_t IO::in(uint16_t port, processor_t *cpu) {
 	return 0x00;
 }
 
-void IO::out(uint16_t port, uint8_t a, processor_t *cpu) {
+void IO::out(uint16_t port, uint8_t a) {
 
 	switch(port & 0xff) {
 	case FDC_SELDSK:
