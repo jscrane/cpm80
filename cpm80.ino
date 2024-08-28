@@ -15,7 +15,7 @@ ps2_serial_kbd kbd;
 hw_serial_kbd kbd(Serial);
 #endif
 
-#if defined(SCR_SERIAL_DSP)
+#if defined(SCREEN_SERIAL_DSP)
 screen dsp;
 #else
 hw_serial_dsp dsp(Serial);

@@ -25,6 +25,10 @@ typedef class z80 processor_t;
 typedef class i8080 processor_t;
 #endif
 
+// uncomment to use TFT / VGA display
+// otherwise serial terminal is used
+//#define SCREEN_SERIAL_DSP
+
 // boot RAM (cpm and cbios)
 // we _must_ have memory above $BRAM_BASE
 #define BRAM_BASE	0xe400u
