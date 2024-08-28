@@ -11,22 +11,14 @@
 
 #if defined(PS2_SERIAL_KBD)
 ps2_serial_kbd kbd;
-
-#elif defined(HW_SERIAL_KBD)
-hw_serial_kbd kbd(Serial);
-
 #else
-#error "No keyboard defined!"
+hw_serial_kbd kbd(Serial);
 #endif
 
 #if defined(SCR_SERIAL_DSP)
 screen dsp;
-
-#elif defined(HW_SERIAL_DSP)
-hw_serial_dsp dsp(Serial);
-
 #else
-#error "No display defined!"
+hw_serial_dsp dsp(Serial);
 #endif
 
 IO io(memory, kbd, dsp);
