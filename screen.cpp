@@ -3,38 +3,39 @@
 #include <memory.h>
 #include <CPU.h>
 #include <display.h>
+#include <serial_dsp.h>
 #include <hardware.h>
 
 #include "config.h"
-#include PROCESSOR_H
+#include "screen.h"
 #include "io.h"
 
 #include "plain_font.h"
 #include "tama_mini02_font.h"
 
 static unsigned r, c;
-static char screen[ROWS][COLS];
+static char buf[ROWS][COLS];
 
-void IO::scr_clear() {
+void screen::clear() {
 	r = c = 0;
 	for (int j = 0; j < ROWS; j++)
 		for (int i = 0; i < COLS; i++)
-			screen[j][i] = ' ';
-	clear();
+			buf[j][i] = ' ';
+	Display::clear();
 }
 
-void IO::scr_reset() {
+void screen::reset() {
 	_esc = _ansi = false;
 	_line = _value = 0;
 
 	Display::begin(BG_COLOUR, FG_COLOUR, ORIENT, COLS*FONT_W, ROWS*FONT_H);
-	scr_clear();
+	clear();
 }
 
-void IO::scr_draw(char ch, unsigned i, unsigned j) {
-	if (screen[j][i] != ch) {
+void screen::draw(char ch, unsigned i, unsigned j) {
+	if (buf[j][i] != ch) {
 		const uint8_t *p = FONT + FONT_W * (ch - FONT_OFF);
-		const uint8_t *q = FONT + FONT_W * (screen[j][i] - FONT_OFF);
+		const uint8_t *q = FONT + FONT_W * (buf[j][i] - FONT_OFF);
 		unsigned x = i * FONT_W;
 		for (unsigned c = 0; c < FONT_W; c++) {
 			uint8_t col = pgm_read_byte(p++);
@@ -48,26 +49,22 @@ void IO::scr_draw(char ch, unsigned i, unsigned j) {
 			}
 			x++;
 		}
-		screen[j][i] = ch;
+		buf[j][i] = ch;
 	}
 }
 
-void IO::dsk_led(unsigned colour) {
-	drawPixel(_dx-1, 0, colour);
-}
-
-void IO::scr_display(uint8_t b) {
+void screen::write(uint8_t b) {
 	char ch = (char)b;
 	switch(ch) {
 	case 0x08:		// '\b'
-		scr_draw(' ', c, r);
+		draw(' ', c, r);
 		if (c-- == 0) {
 			r--;
 			c = COLS-1;
 		}
 		break;
 	case 0x0d:		// '\r'
-		scr_draw(' ', c, r);
+		draw(' ', c, r);
 		c = 0;
 		return;		// no prompt
 	case 0x0a:		// '\n'
@@ -106,36 +103,36 @@ void IO::scr_display(uint8_t b) {
 
 			case 'K':
 				for (unsigned i = c; i < COLS; i++)
-					scr_draw(' ', i, r);
+					draw(' ', i, r);
 				break;
 
 			case 'J':
 				if (_value == 2)
-					scr_clear();
+					clear();
 				break;
 
 			case 'A':
-				scr_draw(' ', c, r);
+				draw(' ', c, r);
 				r -= _value;
 				break;
 
 			case 'B':
-				scr_draw(' ', c, r);
+				draw(' ', c, r);
 				r += _value;
 				break;
 
 			case 'C':
-				scr_draw(' ', c, r);
+				draw(' ', c, r);
 				c += _value;
 				break;
 
 			case 'D':
-				scr_draw(' ', c, r);
+				draw(' ', c, r);
 				c -= _value;
 				break;
 
 			case 'H':
-				scr_draw(' ', c, r);
+				draw(' ', c, r);
 				r = _line;
 				c = _value;
 				break;
@@ -158,7 +155,7 @@ void IO::scr_display(uint8_t b) {
 			_esc = _ansi = false;
 			_line = _value = 0;
 			if (ch >= 0x20 && ch < 0x7f) {
-				scr_draw(ch, c, r);
+				draw(ch, c, r);
 				if (++c == COLS) {
 					c = 0;
 					r++;
@@ -171,9 +168,9 @@ void IO::scr_display(uint8_t b) {
 		r--;
 		for (unsigned j = 0; j < (ROWS-1); j++)
 			for (int i = 0; i < COLS; i++)
-				scr_draw(screen[j+1][i], i, j);
+				draw(buf[j+1][i], i, j);
 		for (unsigned i = 0; i < COLS; i++)
-			scr_draw(' ', i, ROWS-1);
+			draw(' ', i, ROWS-1);
 	}
-	scr_draw('_', c, r);
+	draw('_', c, r);
 }

@@ -5,16 +5,16 @@
 #include <CPU.h>
 #include <ports.h>
 #include <display.h>
+#include <serial_kbd.h>
+#include <serial_dsp.h>
 #include <hardware.h>
 
-#include "config.h"
-#include PROCESSOR_H
-#include "serial_kbd.h"
+#include "screen.h"
 #include "io.h"
 
 void IO::reset() {
 	_kbd.reset();
-	scr_reset();
+	_dsp.reset();
 	dsk_reset();
 	_brk = true;
 }
@@ -73,7 +73,7 @@ void IO::out(uint16_t port, uint8_t a) {
 		dsk_status = (a? dsk_write(): dsk_read());
 		break;
 	case CON_OUT:
-		scr_display(a);
+		_dsp.write(a);
 		break;
 	default:
 		DBG(printf("IO: unhandled OUT(%u)\r\n", port));
