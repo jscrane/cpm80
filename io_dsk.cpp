@@ -24,6 +24,16 @@ static File drive;
 static uint8_t mapping[DRIVES * 13];
 static uint8_t *drives[DRIVES];
 
+
+typedef struct disk_parameters {
+	uint8_t tracks, seclen;
+	uint16_t sectrk;
+} disk_params_t;
+
+static disk_params_t fdparams = { FD_TRACKS, FD_SECLEN, FD_SECTRK };
+static disk_params_t hdparams = { HD_TRACKS, HD_SECLEN, HD_SECTRK };
+static disk_params_t *dp = &fdparams;
+
 void IO::dsk_reset() {
 	trk = sec = 0xff;
 #if defined(USE_SD)
@@ -64,7 +74,7 @@ bool IO::dsk_seek() {
 	if (trk != settrk || sec != setsec) {
 		trk = settrk;
 		sec = setsec;
-		int ok = drive.seek(SECLEN*(SECTRK*trk + sec -1));
+		int ok = drive.seek(dp->seclen*(dp->sectrk*trk + sec -1));
 		return ok == 1;
 	}
 	return true;
@@ -75,7 +85,7 @@ uint8_t IO::dsk_read() {
 	if (!dsk_seek())
 		return SEEK_ERROR;
 
-	uint8_t buf[SECLEN];
+	uint8_t buf[dp->seclen];
 	int n = drive.read(buf, sizeof(buf));
 	if (n < 0)
 		return READ_ERROR;
@@ -91,7 +101,7 @@ uint8_t IO::dsk_write() {
 	if (!dsk_seek())
 		return SEEK_ERROR;
 
-	uint8_t buf[SECLEN];
+	uint8_t buf[dp->seclen];
 	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = _mem[setdma + i];
 	int n = drive.write(buf, sizeof(buf));
@@ -103,10 +113,12 @@ uint8_t IO::dsk_write() {
 
 uint8_t IO::dsk_select(uint8_t a) {
 
-	if (a >= DRIVES) {
+	if (a >= FD_DRIVES) {
 		DBG(printf("dsk_select: %d\r\n", a));
 		return ILLEGAL_DRIVE;
 	}
+
+	dp = &fdparams;
 
 	trk = sec = 0xff;
 	if (drive)
@@ -129,9 +141,10 @@ uint8_t IO::dsk_select(uint8_t a) {
 	return OK;
 }
 
+// tracks are numbered from 0
 uint8_t IO::dsk_settrk(uint8_t a) {
 
-	if (a > TRACKS) {
+	if (a >= dp->tracks) {
 		DBG(printf("settrk: %d\r\n", a));
 		return ILLEGAL_TRACK;
 	}
@@ -140,9 +153,10 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 	return OK;
 }
 
+// sectors are numbered from 1
 uint8_t IO::dsk_setsec(uint8_t a) {
 
-	if (a > SECTRK) {
+	if (a <= 0 || a > dp->sectrk) {
 		DBG(printf("setsec: %d\r\n", a));
 		return ILLEGAL_SECTOR;
 	}

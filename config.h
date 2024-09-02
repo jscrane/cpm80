@@ -6,10 +6,19 @@
 // ;       fixed data tables for four-drive standard
 // ;       ibm-compatible 8" disks
 
-#define DRIVES		4
-#define TRACKS		77
-#define SECLEN		128
-#define SECTRK		26
+// drives 0-3 (ibm-3740)
+#define FD_DRIVES	4
+#define FD_TRACKS	77
+#define FD_SECLEN	128
+#define FD_SECTRK	26
+
+// drives 8-9 (z80pack-hd)
+#define HD_DRIVES	2
+#define HD_TRACKS	255
+#define HD_SECLEN	128
+#define HD_SECTRK	128
+
+#define DRIVES (FD_DRIVES + HD_DRIVES)
 
 #if defined(USE_SD)
 #define PROGRAMS	"/cpm80/"
