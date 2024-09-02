@@ -1,4 +1,4 @@
-cpma.cpm
+foo.cpm
 zork1.cpm
 hitchhiker.cpm
 volks4th.cpm

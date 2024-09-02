@@ -23,7 +23,7 @@
 static File drive;
 static uint8_t mapping[DRIVES * 13];
 static uint8_t *drives[DRIVES];
-
+static unsigned last_drive;
 
 typedef struct disk_parameters {
 	uint8_t tracks, seclen;
@@ -57,8 +57,10 @@ void IO::dsk_reset() {
 		*p++ = 0;
 		drives[i] = q;
 		q = p;
-		if (p - mapping >= n)
+		if (p - mapping >= n) {
+			last_drive = i;
 			break;
+		}
 	}
 
 	// read boot sector
@@ -123,6 +125,11 @@ uint8_t IO::dsk_select(uint8_t a) {
 	if (valid_hd(a)) {
 		i = a - HD_FIRST + FD_DRIVES;
 		dp = &hdparams;
+	}
+
+	if (i > last_drive) {
+		DBG(printf("dsk_select: %d < %d\r\n", last_drive, i));
+		return ILLEGAL_DRIVE;
 	}
 
 	trk = sec = 0xff;
