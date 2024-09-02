@@ -113,18 +113,23 @@ uint8_t IO::dsk_write() {
 
 uint8_t IO::dsk_select(uint8_t a) {
 
-	if (a >= FD_DRIVES) {
+	if (!valid_fd(a) && !valid_hd(a)) {
 		DBG(printf("dsk_select: %d\r\n", a));
 		return ILLEGAL_DRIVE;
 	}
 
+	uint8_t i = a;
 	dp = &fdparams;
+	if (valid_hd(a)) {
+		i = a - HD_FIRST + FD_DRIVES;
+		dp = &hdparams;
+	}
 
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
 	char buf[32];
-	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[a]);
+	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[i]);
 #if defined(USE_SD)
 	drive = SD.open(buf, O_READ | O_WRITE);
 #elif defined(USE_SPIFFS)

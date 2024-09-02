@@ -11,12 +11,15 @@
 #define FD_TRACKS	77
 #define FD_SECLEN	128
 #define FD_SECTRK	26
+#define valid_fd(d)	((d) >= 0 && (d) < FD_DRIVES)
 
 // drives 8-9 (z80pack-hd)
 #define HD_DRIVES	2
+#define HD_FIRST	8
 #define HD_TRACKS	255
 #define HD_SECLEN	128
 #define HD_SECTRK	128
+#define valid_hd(d)	((d) >= HD_FIRST && (d) < HD_FIRST+HD_DRIVES)
 
 #define DRIVES (FD_DRIVES + HD_DRIVES)
 
