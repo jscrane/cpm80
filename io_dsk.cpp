@@ -37,7 +37,7 @@ static disk_params_t *dp = &fdparams;
 void IO::dsk_reset() {
 	trk = sec = 0xff;
 #if defined(USE_SD)
-	File map = SD.open(PROGRAMS "drivemap.txt", O_READ);
+	File map = SD.open(PROGRAMS "drivemap.txt", FILE_READ);
 #elif defined(USE_SPIFFS)
 	File map = SPIFFS.open(PROGRAMS "drivemap.txt", "r");
 #elif defined(USE_LITTLEFS)
@@ -138,7 +138,7 @@ uint8_t IO::dsk_select(uint8_t a) {
 	char buf[32];
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[i]);
 #if defined(USE_SD)
-	drive = SD.open(buf, O_READ | O_WRITE);
+	drive = SD.open(buf, FILE_READ);
 #elif defined(USE_SPIFFS)
 	drive = SPIFFS.open(buf, "r+");
 #elif defined(USE_LITTLEFS)
@@ -168,7 +168,7 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 // sectors are numbered from 1
 uint8_t IO::dsk_setsec(uint8_t a) {
 
-	if (a <= 0 || a > dp->sectrk) {
+	if (a < 1 || a > dp->sectrk) {
 		DBG(printf("setsec: %d\r\n", a));
 		return ILLEGAL_SECTOR;
 	}
