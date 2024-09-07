@@ -21,18 +21,29 @@
 #include "io.h"
 
 static File drive;
-static uint8_t mapping[DRIVES * 13];
-static uint8_t *drives[DRIVES];
-static unsigned last_drive;
+
+#define IMAGE_LEN	15
+#define DRIVE_LETTERS	26
 
 typedef struct disk_parameters {
 	uint8_t tracks, seclen;
 	uint16_t sectrk;
+	char image[IMAGE_LEN];
 } disk_params_t;
 
-static disk_params_t fdparams = { FD_TRACKS, FD_SECLEN, FD_SECTRK };
-static disk_params_t hdparams = { HD_TRACKS, HD_SECLEN, HD_SECTRK };
-static disk_params_t *dp = &fdparams;
+disk_params_t disk_params[DRIVES];
+disk_params_t *drive_letters[DRIVE_LETTERS], *dp;
+
+static unsigned read_unsigned(File map) {
+	unsigned u = 0;
+	for(;;) {
+		char ch = map.read();
+		if (ch < '0' || ch > '9')
+			break;
+		u = u * 10 + (ch - '0');
+	}
+	return u;
+}
 
 void IO::dsk_reset() {
 	trk = sec = 0xff;
@@ -48,20 +59,30 @@ void IO::dsk_reset() {
 		return;
 	}
 
-	int n = map.read(mapping, sizeof(mapping));
-	map.close();
-	uint8_t *p = mapping, *q = p;
-	for (unsigned i = 0; i < DRIVES; i++) {
-		while (*p != '\n')
-			p++;
-		*p++ = 0;
-		drives[i] = q;
-		q = p;
-		if (p - mapping >= n) {
-			last_drive = i;
+	for (int i = 0; i < DRIVES; i++) {
+		int ch = map.read();
+		if (ch == -1)
 			break;
+		if (ch == '\n')
+			continue;
+		disk_params_t *p = &disk_params[i];
+		drive_letters[ch - 'A'] = p;
+		map.read();	// skip ':'
+		// read image-name
+		for (int j = 0; j < IMAGE_LEN; j++) {
+			ch = map.read();
+			if (ch == ' ') {
+				p->image[j] = 0;
+				break;
+			}
+			p->image[j] = ch;
 		}
+		p->tracks = read_unsigned(map);
+		p->seclen = read_unsigned(map);
+		p->sectrk = read_unsigned(map);
+		DBG(printf("%s: %d %d %d\r\n", p->image, p->tracks, p->seclen, p->sectrk));
 	}
+	map.close();
 
 	// read boot sector
 	settrk = 0;
@@ -115,28 +136,18 @@ uint8_t IO::dsk_write() {
 
 uint8_t IO::dsk_select(uint8_t a) {
 
-	if (!valid_fd(a) && !valid_hd(a)) {
+	if (!drive_letters[a]) {
 		DBG(printf("dsk_select: %d\r\n", a));
 		return ILLEGAL_DRIVE;
 	}
 
-	uint8_t i = a;
-	dp = &fdparams;
-	if (valid_hd(a)) {
-		i = a - HD_FIRST + FD_DRIVES;
-		dp = &hdparams;
-	}
-
-	if (i > last_drive) {
-		DBG(printf("dsk_select: %d < %d\r\n", last_drive, i));
-		return ILLEGAL_DRIVE;
-	}
+	dp = drive_letters[a];
 
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
 	char buf[32];
-	snprintf(buf, sizeof(buf), PROGRAMS"%s", drives[i]);
+	snprintf(buf, sizeof(buf), PROGRAMS"%s", dp->image);
 #if defined(USE_SD)
 	drive = SD.open(buf, FILE_READ);
 #elif defined(USE_SPIFFS)

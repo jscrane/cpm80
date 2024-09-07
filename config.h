@@ -1,26 +1,12 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-// number of entries in drivemap.txt
+// max number of entries in drivemap.txt
 // hardwired into BIOS:
 // ;       fixed data tables for four-drive standard
 // ;       ibm-compatible 8" disks
-
-// drives 0-3 (ibm-3740)
 #define FD_DRIVES	4
-#define FD_TRACKS	77
-#define FD_SECLEN	128
-#define FD_SECTRK	26
-#define valid_fd(d)	((d) >= 0 && (d) < FD_DRIVES)
-
-// drives 8-9 (z80pack-hd)
 #define HD_DRIVES	2
-#define HD_FIRST	8
-#define HD_TRACKS	255
-#define HD_SECLEN	128
-#define HD_SECTRK	128
-#define valid_hd(d)	((d) >= HD_FIRST && (d) < HD_FIRST+HD_DRIVES)
-
 #define DRIVES (FD_DRIVES + HD_DRIVES)
 
 #if defined(USE_SD)
