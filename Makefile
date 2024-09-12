@@ -25,22 +25,23 @@ endif
 
 ifeq ($t, esp32)
 UPLOADSPEED := 921600
-FS_DIR := disks
-#LIBRARIES += FS SPIFFS
 LIBRARIES += FS
 TERMINAL_SPEED = 115200
 
 ifeq ($b, lilygo)
 BOARD := ttgo-t7-v14-mini32
 SERIAL_PORT := /dev/ttyACM0
+FS_DIR := disks/emu8080
 CPPFLAGS += -DHARDWARE_H=\"hw/ttgo-t7-v14-mini32.h\" -DROWS=32 -DCOLS=80 -DUSE_Z80
 LIBRARIES += SPIFFS FabGL WiFi
 
 else
 BOARD := node32s
+TERMINAL_EXTRA_FLAGS := -C serialout.txt
 CPPFLAGS += -DUSER_SETUP_LOADED -DILI9341_DRIVER -DTFT_CS=5 -DTFT_DC=2 \
 	-DTFT_RST=-1 -DSPI_FREQUENCY=40000000 -DLOAD_GLCD \
-	-DUSE_SD -DHARDWARE_H=\"hw/node32s-example.h\"
+	-DHARDWARE_H=\"hw/node32s-example.h\" \
+	-DUSE_SD -DUSE_Z80
 LIBRARIES += SD TFT_eSPI
 endif
 endif

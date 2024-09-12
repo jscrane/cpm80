@@ -22,7 +22,7 @@
 
 static File drive;
 
-#define IMAGE_LEN	15
+#define IMAGE_LEN	20
 #define DRIVE_LETTERS	26
 
 typedef struct disk_parameters {
@@ -179,7 +179,7 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 // sectors are numbered from 1
 uint8_t IO::dsk_setsec(uint8_t a) {
 
-	if (a < 1 || a > dp->sectrk) {
+	if (a > dp->sectrk) {
 		DBG(printf("setsec: %d\r\n", a));
 		return ILLEGAL_SECTOR;
 	}
