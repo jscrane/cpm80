@@ -1,0 +1,2 @@
+A:boot.dsk 77 128 26
+I:hd-fuzix.dsk 255 128 128
