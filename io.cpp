@@ -33,7 +33,9 @@ uint8_t IO::kbd_poll() {
 
 uint8_t IO::in(uint16_t port) {
 
-	switch(port & 0xff) {
+	port &= 0xff;
+
+	switch(port) {
 	case CON_ST:
 		return _kbd.available()? 0xff: 0x00;
 	case CON_IN:
@@ -42,6 +44,10 @@ uint8_t IO::in(uint16_t port) {
 		return dsk_status;
 	case FDC_IODONE:
 		return 1;
+	case FDC_GETSEC_L:
+		return setsec;
+	case FDC_GETTRK:
+		return settrk;
 	default:
 		DBG(printf("IO: unhandled IN(%u)\r\n", port));
 		break;
@@ -51,23 +57,23 @@ uint8_t IO::in(uint16_t port) {
 
 void IO::out(uint16_t port, uint8_t a) {
 
-	switch(port & 0xff) {
+	port &= 0xff;
+
+	switch(port) {
 	case FDC_SELDSK:
 		dsk_status = dsk_select(a);
 		break;
 	case FDC_SETTRK:
 		dsk_status = dsk_settrk(a);
 		break;
-	case FDC_SETSEC:
+	case FDC_SETSEC_L:
 		dsk_status = dsk_setsec(a);
 		break;
 	case FDC_SETDMA_L:
-		setdma = a;
-		dsk_status = OK;
+		setdma = (setdma & 0xff00) | a;
 		break;
 	case FDC_SETDMA_H:
-		setdma |= (a << 8);
-		dsk_status = OK;
+		setdma = (a << 8) | (setdma & 0xff);
 		break;
 	case FDC_IO:
 		dsk_status = (a? dsk_write(): dsk_read());
@@ -75,8 +81,11 @@ void IO::out(uint16_t port, uint8_t a) {
 	case CON_OUT:
 		_dsp.write(a);
 		break;
+	case FDC_SETSEC_H:
+		// ignore?
+		break;
 	default:
-		DBG(printf("IO: unhandled OUT(%u)\r\n", port));
+		DBG(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
 		break;
 	}
 }

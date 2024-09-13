@@ -7,6 +7,8 @@ class serial_kbd;
 // (see https://st.sdf-eu.org/i8080/index.html)
 #define CON_ST		0
 #define CON_IN		1
+#define FDC_GETTRK	11
+#define FDC_GETSEC_L	12
 #define FDC_IODONE	13
 #define FDC_STATUS	14
 
@@ -14,10 +16,11 @@ class serial_kbd;
 #define CON_OUT		1
 #define FDC_SELDSK	10
 #define FDC_SETTRK	11
-#define FDC_SETSEC	12
+#define FDC_SETSEC_L	12
 #define FDC_IO		13
 #define FDC_SETDMA_L	15
 #define FDC_SETDMA_H	16
+#define FDC_SETSEC_H	17
 
 // disk errors
 #define OK		0

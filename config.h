@@ -1,15 +1,13 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-// number of entries in drivemap.txt
+// max number of entries in drivemap.txt
 // hardwired into BIOS:
 // ;       fixed data tables for four-drive standard
 // ;       ibm-compatible 8" disks
-
-#define DRIVES		4
-#define TRACKS		77
-#define SECLEN		128
-#define SECTRK		26
+#define FD_DRIVES	4
+#define HD_DRIVES	2
+#define DRIVES (FD_DRIVES + HD_DRIVES)
 
 #if defined(USE_SD)
 #define PROGRAMS	"/cpm80/"

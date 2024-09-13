@@ -61,7 +61,7 @@ The ROMs were loaded at addresses ```0xe400``` (cpm22) and ```0xfa00``` (cbios),
 Booting CP/M from disk
 ----------------------
 
-The current system loads CP/M from disk, as nature intended. The boot disk ```cpma.cpm``` comes
+The next system loads CP/M from disk, as nature intended. The boot disk ```cpma.cpm``` comes
 from the excellent [emu8080](https://st.sdf-eu.org/i8080/index.html).
 
 A modified 8080 port-mapping supports the BIOS found on this disk (see ```io.cpp```). The file
@@ -74,4 +74,12 @@ bootable disk-images as follows:
 ```
 $ mkfs.cpm -b system.bin foo.cpm
 ```
+
+z80pack
+-------
+
+A later implementation used a bootable system image produced by [putsys](https://github.com/udo-munk/z80pack/tree/master/cpmsim/srccpm2)
+from [z80pack](https://github.com/udo-munk/z80pack) in conjunction with ```mkfs.cpm``` from ```cpmtools```.
+
+This [BIOS](https://github.com/udo-munk/z80pack/blob/master/cpmsim/srccpm2/bios.asm) has support for hard-disk images (4MB).
 

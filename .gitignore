@@ -1,3 +1,4 @@
+serialout.txt
 *.bin
 *.elf
 .*.d
