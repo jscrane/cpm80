@@ -18,6 +18,7 @@
 #include <serial_dsp.h>
 
 #include "config.h"
+#include "banked_memory.h"
 #include "io.h"
 
 static File drive;
