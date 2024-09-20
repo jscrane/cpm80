@@ -1,5 +1,4 @@
-A:cpma.cpm 77 128 26
-B:zork1.cpm 77 128 26
-C:hitchhiker.cpm 77 128 26
-D:volks4th.cpm 77 128 26
-I:hd-tools.dsk 255 128 128
+A:cpm22-1.dsk 77 128 26
+B:cpm22-2.dsk 77 128 26
+C:cpm22-62khd.dsk 77 128 26
+
