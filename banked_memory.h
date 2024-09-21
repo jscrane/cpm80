@@ -1,6 +1,9 @@
 #if !defined(__BANKED_MEMORY_H__)
 #define __BANKED_MEMORY_H__
 
+// see z80pack/cpmsim/srcsim/memsim.c
+#define DEFAULT_BANK_SIZE (48 * 1024)
+
 class BankedMemory: public Memory {
 public:
 	virtual Device *get(address at) const;
@@ -25,7 +28,7 @@ public:
 
 private:
 	uint8_t _bank;
-	uint16_t _bank_size;
+	uint16_t _bank_size = DEFAULT_BANK_SIZE;
 };
 
 #endif

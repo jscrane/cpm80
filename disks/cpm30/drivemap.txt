@@ -1,2 +1,3 @@
 A:cpm3-1.dsk 77 128 26
 B:cpm3-2.dsk 77 128 26
+I:hd-tools.dsk 255 128 128
