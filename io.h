@@ -21,6 +21,9 @@ class serial_kbd;
 #define FDC_SETDMA_L	15
 #define FDC_SETDMA_H	16
 #define FDC_SETSEC_H	17
+#define MEM_INIT	20
+#define MEM_SELECT	21
+#define MEM_SIZE	22
 
 // disk errors
 #define OK		0
@@ -32,9 +35,11 @@ class serial_kbd;
 #define WRITE_ERROR	6
 #define ILLEGAL_CMD	7
 
+class BankedMemory;
+
 class IO: public PortDevice, public Display {
 public:
-	IO(Memory &mem, serial_kbd &kbd, serial_dsp &dsp): _mem(mem), _kbd(kbd), _dsp(dsp) {}
+	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp): _mem(mem), _kbd(kbd), _dsp(dsp) {}
 
 	uint8_t in(uint16_t p);
 	void out(uint16_t p, uint8_t b);
@@ -42,7 +47,6 @@ public:
 	void reset();
 private:
 	serial_kbd &_kbd;
-	bool _brk;
 	uint8_t kbd_poll();
 
 	void dsk_reset();
@@ -55,7 +59,7 @@ private:
 	uint8_t settrk, setsec, trk, sec;
 	uint16_t setdma;
 	uint8_t dsk_status;
-	Memory &_mem;
+	BankedMemory &_mem;
 
 	serial_dsp &_dsp;
 };

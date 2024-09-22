@@ -9,6 +9,7 @@
 #include <serial_dsp.h>
 #include <hardware.h>
 
+#include "banked_memory.h"
 #include "screen.h"
 #include "io.h"
 
@@ -16,7 +17,6 @@ void IO::reset() {
 	_kbd.reset();
 	_dsp.reset();
 	dsk_reset();
-	_brk = true;
 }
 
 uint8_t IO::kbd_poll() {
@@ -26,8 +26,7 @@ uint8_t IO::kbd_poll() {
 		yield();
 #endif
 		c = _kbd.read();
-	} while (c == 0xff && !_brk);
-	_brk = false;
+	} while (c == 0xff);
 	return c;
 }
 
@@ -35,7 +34,7 @@ uint8_t IO::in(uint16_t port) {
 
 	port &= 0xff;
 
-	switch(port) {
+	switch (port) {
 	case CON_ST:
 		return _kbd.available()? 0xff: 0x00;
 	case CON_IN:
@@ -83,6 +82,15 @@ void IO::out(uint16_t port, uint8_t a) {
 		break;
 	case FDC_SETSEC_H:
 		// ignore?
+		break;
+	case MEM_INIT:
+		_mem.begin(a);
+		break;
+	case MEM_SELECT:
+		_mem.select(a);
+		break;
+	case MEM_SIZE:
+		_mem.size(a);
 		break;
 	default:
 		DBG(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));

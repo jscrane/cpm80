@@ -21,6 +21,9 @@ screen dsp;
 hw_serial_dsp dsp(Serial);
 #endif
 
+#include "banked_memory.h"
+BankedMemory memory;
+
 IO io(memory, kbd, dsp);
 processor_t cpu(memory, io);
 
