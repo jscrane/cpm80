@@ -49,7 +49,7 @@ static unsigned read_unsigned(File map) {
 void IO::dsk_reset() {
 	trk = sec = 0xff;
 #if defined(USE_SD)
-	File map = SD.open(PROGRAMS "drivemap.txt", FILE_READ);
+	File map = SD.open(PROGRAMS "drivemap.txt", "r+");
 #elif defined(USE_SPIFFS)
 	File map = SPIFFS.open(PROGRAMS "drivemap.txt", "r");
 #elif defined(USE_LITTLEFS)
@@ -150,7 +150,7 @@ uint8_t IO::dsk_select(uint8_t a) {
 	char buf[32];
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", dp->image);
 #if defined(USE_SD)
-	drive = SD.open(buf, FILE_READ);
+	drive = SD.open(buf, "r+");
 #elif defined(USE_SPIFFS)
 	drive = SPIFFS.open(buf, "r+");
 #elif defined(USE_LITTLEFS)

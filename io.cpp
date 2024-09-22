@@ -17,7 +17,6 @@ void IO::reset() {
 	_kbd.reset();
 	_dsp.reset();
 	dsk_reset();
-	_brk = true;
 }
 
 uint8_t IO::kbd_poll() {
@@ -27,8 +26,7 @@ uint8_t IO::kbd_poll() {
 		yield();
 #endif
 		c = _kbd.read();
-	} while (c == 0xff && !_brk);
-	_brk = false;
+	} while (c == 0xff);
 	return c;
 }
 
@@ -36,7 +34,7 @@ uint8_t IO::in(uint16_t port) {
 
 	port &= 0xff;
 
-	switch(port) {
+	switch (port) {
 	case CON_ST:
 		return _kbd.available()? 0xff: 0x00;
 	case CON_IN:
