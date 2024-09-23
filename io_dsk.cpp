@@ -26,6 +26,22 @@ static File drive;
 #define IMAGE_LEN	20
 #define DRIVE_LETTERS	26
 
+#if defined(USE_SD)
+#define DISK SD
+#elif defined(USE_SPIFFS)
+#define DISK SPIFFS
+#elif defined(USE_LITTLEFS)
+#define DISK LittleFS
+#endif
+
+#if defined(ENERGIA_ARCH_tivac)
+#define MODE_READ	O_READ
+#define MODE_READWRITE	(O_READ | O_WRITE)
+#else
+#define MODE_READ	"r"
+#define MODE_READWRITE	"r+"
+#endif
+
 typedef struct disk_parameters {
 	uint8_t tracks, seclen;
 	uint16_t sectrk;
@@ -48,13 +64,8 @@ static unsigned read_unsigned(File map) {
 
 void IO::dsk_reset() {
 	trk = sec = 0xff;
-#if defined(USE_SD)
-	File map = SD.open(PROGRAMS "drivemap.txt", "r+");
-#elif defined(USE_SPIFFS)
-	File map = SPIFFS.open(PROGRAMS "drivemap.txt", "r");
-#elif defined(USE_LITTLEFS)
-	File map = LittleFS.open(PROGRAMS "drivemap.txt", "r");
-#endif
+
+	File map = DISK.open(PROGRAMS "drivemap.txt", MODE_READ);
 	if (!map) {
 		DBG(println(F("drivemap: open failed")));
 		return;
@@ -147,15 +158,10 @@ uint8_t IO::dsk_select(uint8_t a) {
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
+
 	char buf[32];
 	snprintf(buf, sizeof(buf), PROGRAMS"%s", dp->image);
-#if defined(USE_SD)
-	drive = SD.open(buf, "r+");
-#elif defined(USE_SPIFFS)
-	drive = SPIFFS.open(buf, "r+");
-#elif defined(USE_LITTLEFS)
-	drive = LittleFS.open(buf, "r+");
-#endif
+	drive = DISK.open(buf, MODE_READWRITE);
 	if (!drive) {
 		DBG(print(buf));
 		DBG(println(F(": open failed")));
