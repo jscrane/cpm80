@@ -23,7 +23,7 @@ class serial_kbd;
 #define FDC_SETSEC_H	17
 #define MEM_INIT	20
 #define MEM_SELECT	21
-#define MEM_SIZE	22
+#define MEM_PAGES	22
 
 // disk errors
 #define OK		0

@@ -55,11 +55,9 @@ typedef class i8080 processor_t;
 #define BG_COLOUR	BLACK
 #define FG_COLOUR	WHITE
 
-#if defined(USE_UTFT)
-#define ORIENT	landscape
-#elif defined(USE_ESPI)
+#if defined(USE_ESPI)
 #define ORIENT	reverse_landscape
-#elif defined(USE_VGA)
+#else
 #define ORIENT	landscape
 #endif
 

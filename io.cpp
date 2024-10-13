@@ -89,7 +89,7 @@ void IO::out(uint16_t port, uint8_t a) {
 	case MEM_SELECT:
 		_mem.select(a);
 		break;
-	case MEM_SIZE:
+	case MEM_PAGES:
 		_mem.size(a);
 		break;
 	default:
