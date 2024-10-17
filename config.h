@@ -27,7 +27,7 @@ typedef class i8080 processor_t;
 
 // uncomment to use TFT / VGA display
 // otherwise serial terminal is used
-//#define SCREEN_SERIAL_DSP
+#define SCREEN_SERIAL_DSP
 
 // boot RAM (cpm and cbios)
 // we _must_ have memory above $BRAM_BASE
@@ -59,33 +59,6 @@ typedef class i8080 processor_t;
 #define ORIENT	reverse_landscape
 #else
 #define ORIENT	landscape
-#endif
-
-#if !defined(FONT)
-#define FONT	plain_font
-#endif
-
-#if FONT == plain_font
-#if !defined(ROWS)
-#define ROWS    	30
-#endif
-#if !defined(COLS)
-#define COLS    	64
-#endif
-#define FONT_W		5
-#define FONT_H		8
-#define FONT_OFF	0x20
-
-#elif FONT == tama_font
-#if !defined(ROWS)
-#define ROWS		30
-#endif
-#if !defined(COLS)
-#define COLS		80
-#endif
-#define FONT_W		4
-#define FONT_H		8
-#define FONT_OFF	0x20
 #endif
 
 #endif
