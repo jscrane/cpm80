@@ -37,9 +37,15 @@ static File drive;
 #if defined(ENERGIA_ARCH_tivac)
 #define MODE_READ	O_READ
 #define MODE_READWRITE	(O_READ | O_WRITE)
+
 #else
 #define MODE_READ	"r"
+#if defined(USE_LITTLEFS) && defined(LITTLEFS_READ_MODE)
+#define MODE_READWRITE	LITTLEFS_READ_MODE
+#else
 #define MODE_READWRITE	"r+"
+#endif
+
 #endif
 
 typedef struct disk_parameters {
