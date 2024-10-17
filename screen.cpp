@@ -30,8 +30,10 @@ void screen::reset() {
 	_line = _value = 0;
 
 	Display::begin(BG_COLOUR, FG_COLOUR, ORIENT);
-	rows = min(ROWS, screenHeight() / charHeight());
-	cols = min(COLS, screenWidth() / charWidth());
+	rows = screenHeight() / charHeight();
+	if (rows > ROWS) rows = ROWS;
+	cols = screenWidth() / charWidth();
+	if (cols > COLS) cols = COLS;
 	DBG(printf("screen %ux%u\r\n", cols, rows));
 	Display::setScreen(cols * charWidth(), rows * charHeight());
 	clear();
