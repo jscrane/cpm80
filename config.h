@@ -27,7 +27,7 @@ typedef class i8080 processor_t;
 
 // uncomment to use TFT / VGA display
 // otherwise serial terminal is used
-#define SCREEN_SERIAL_DSP
+//#define SCREEN_SERIAL_DSP
 
 // boot RAM (cpm and cbios)
 // we _must_ have memory above $BRAM_BASE

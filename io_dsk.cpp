@@ -112,6 +112,7 @@ void IO::dsk_reset() {
 }
 
 bool IO::dsk_seek() {
+
 	if (trk != settrk || sec != setsec) {
 		trk = settrk;
 		sec = setsec;
@@ -158,6 +159,9 @@ uint8_t IO::dsk_select(uint8_t a) {
 		DBG(printf("dsk_select: %d\r\n", a));
 		return ILLEGAL_DRIVE;
 	}
+
+	if (dp == drive_letters[a])
+		return OK;
 
 	dp = drive_letters[a];
 
