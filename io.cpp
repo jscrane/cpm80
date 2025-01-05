@@ -47,6 +47,14 @@ uint8_t IO::in(uint16_t port) {
 		return setsec;
 	case FDC_GETTRK:
 		return settrk;
+	case MEM_INIT:
+		return _mem.num_banks();
+	case MEM_SELECT:
+		return _mem.selected();
+	case MEM_PAGES:
+		return _mem.size();
+	case TIMER:
+		return timer? 1: 0;
 	default:
 		DBG(printf("IO: unhandled IN(%u)\r\n", port));
 		break;
@@ -92,8 +100,19 @@ void IO::out(uint16_t port, uint8_t a) {
 	case MEM_PAGES:
 		_mem.size(a);
 		break;
+	case TIMER:
+		if (timer && !a) {
+			hardware_cancel_timer(timer);
+			timer = 0;
+		} else if (!timer && a)
+			timer = hardware_interval_timer(10, [this]() { tick(); });
+		break;
 	default:
 		DBG(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
 		break;
 	}
+}
+
+void IO::tick() {
+	// NYI
 }

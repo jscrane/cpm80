@@ -10,9 +10,15 @@ public:
 
 	void begin(uint8_t nbanks);
 
+	uint8_t num_banks() const { return _nbanks; }
+
 	void select(uint8_t bank) { _bank = bank; }
 
-	void size(uint8_t pages) { _bank_size = pages * 256; }
+	uint8_t selected() const { return _bank; }
+
+	void size(uint8_t pages) { _bank_size = (pages << 8); }
+
+	uint8_t size() const { return _bank_size >> 8; }
 
 	class Bank: public Memory::Device {
 	public:
@@ -27,7 +33,7 @@ public:
 	};
 
 private:
-	uint8_t _bank;
+	uint8_t _bank, _nbanks;
 	uint16_t _bank_size = DEFAULT_BANK_SIZE;
 };
 

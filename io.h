@@ -4,7 +4,7 @@
 class serial_kbd;
 
 // input ports: A = IN(n)
-// (see https://st.sdf-eu.org/i8080/index.html)
+// (see https://github.com/udo-munk/z80pack/blob/master/cpmsim/srcsim/simio.c)
 #define CON_ST		0
 #define CON_IN		1
 #define FDC_GETTRK	11
@@ -24,6 +24,7 @@ class serial_kbd;
 #define MEM_INIT	20
 #define MEM_SELECT	21
 #define MEM_PAGES	22
+#define TIMER		27
 
 // disk errors
 #define OK		0
@@ -59,6 +60,10 @@ private:
 	uint8_t settrk, setsec, trk, sec;
 	uint16_t setdma;
 	uint8_t dsk_status;
+
+	void tick();
+	uint8_t timer;
+
 	BankedMemory &_mem;
 
 	serial_dsp &_dsp;
