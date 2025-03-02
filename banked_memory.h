@@ -16,9 +16,9 @@ public:
 
 	uint8_t selected() const { return _bank; }
 
-	void size(uint8_t pages) { _bank_size = (pages << 8); }
+	void bank_size(uint8_t pages) { _bank_size = (pages << 8); }
 
-	uint8_t size() const { return _bank_size >> 8; }
+	uint8_t bank_size() const { return _bank_size >> 8; }
 
 	class Bank: public Memory::Device {
 	public:

@@ -12,17 +12,15 @@ static BankedMemory::Bank **banks;
 
 Memory::Device *BankedMemory::get(address at) const {
 
-	if (_bank == 0 || at >= _bank_size) {
-//		DBG(println(at, 16));
+	if (_bank == 0 || at >= _bank_size)
 		return Memory::get(at);
-	}
 
 	return banks[_bank];
 }
 
 void BankedMemory::begin(uint8_t nbanks) {
 
-	DBG(printf("%d banks\r\n", nbanks));
+	DBG_MEM(printf("%d banks\r\n", nbanks));
 
 	_nbanks = nbanks;
 	banks = new BankedMemory::Bank*[nbanks];
@@ -32,7 +30,7 @@ void BankedMemory::begin(uint8_t nbanks) {
 
 BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 
-	DBG(printf("new bank %d bytes\r\n", bytes));
+	DBG_MEM(printf("new bank %d bytes\r\n", bytes));
 
 #if defined(BOARD_HAS_PSRAM)
 	_mem = (uint8_t *)ps_malloc(bytes);
@@ -40,7 +38,7 @@ BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 	_mem = (uint8_t *)malloc(bytes);
 #endif
 	if (!_mem)
-		DBG(printf("malloc %d failed\r\n", bytes));
+		ERR(printf("malloc %d failed\r\n", bytes));
 }
 
 BankedMemory::Bank::~Bank() {

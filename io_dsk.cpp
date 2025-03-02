@@ -73,7 +73,7 @@ void IO::dsk_reset() {
 
 	File map = DISK.open(PROGRAMS "drivemap.txt", MODE_READ);
 	if (!map) {
-		DBG(println(F("drivemap: open failed")));
+		ERR(println(F(PROGRAMS "drivemap.txt: open failed")));
 		return;
 	}
 
@@ -156,7 +156,7 @@ uint8_t IO::dsk_write() {
 uint8_t IO::dsk_select(uint8_t a) {
 
 	if (!drive_letters[a]) {
-		DBG(printf("dsk_select: %d\r\n", a));
+		ERR(printf("dsk_select: %d\r\n", a));
 		return ILLEGAL_DRIVE;
 	}
 
@@ -170,11 +170,11 @@ uint8_t IO::dsk_select(uint8_t a) {
 		drive.close();
 
 	char buf[32];
-	snprintf(buf, sizeof(buf), PROGRAMS"%s", dp->image);
+	snprintf(buf, sizeof(buf), PROGRAMS "%s", dp->image);
 	drive = DISK.open(buf, MODE_READWRITE);
 	if (!drive) {
-		DBG(print(buf));
-		DBG(println(F(": open failed")));
+		ERR(print(buf));
+		ERR(println(F(": open failed")));
 		return ILLEGAL_DRIVE;
 	}
 
@@ -185,7 +185,7 @@ uint8_t IO::dsk_select(uint8_t a) {
 uint8_t IO::dsk_settrk(uint8_t a) {
 
 	if (a >= dp->tracks) {
-		DBG(printf("settrk: %d\r\n", a));
+		ERR(printf("settrk: %d\r\n", a));
 		return ILLEGAL_TRACK;
 	}
 
@@ -197,7 +197,7 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 uint8_t IO::dsk_setsec(uint8_t a) {
 
 	if (a > dp->sectrk) {
-		DBG(printf("setsec: %d\r\n", a));
+		ERR(printf("setsec: %d\r\n", a));
 		return ILLEGAL_SECTOR;
 	}
 

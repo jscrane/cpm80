@@ -13,6 +13,7 @@
 #define ROWS	24
 #define COLS	80
 
+#if defined(SCREEN_SERIAL_DSP)
 static unsigned r, c;
 static unsigned rows, cols;
 static char buf[ROWS][COLS];
@@ -168,3 +169,4 @@ void screen::write(uint8_t b) {
 	}
 	draw('_', c, r);
 }
+#endif

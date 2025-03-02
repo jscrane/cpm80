@@ -48,11 +48,14 @@ uint8_t IO::in(uint16_t port) {
 	case FDC_GETTRK:
 		return settrk;
 	case MEM_INIT:
+		DBG_EMU(printf("IO: IN(MEM_INIT)\r\n"));
 		return _mem.num_banks();
 	case MEM_SELECT:
+		DBG_EMU(printf("IO: IN(MEM_SELECT)\r\n"));
 		return _mem.selected();
-	case MEM_PAGES:
-		return _mem.size();
+	case MEM_BANKSIZE:
+		DBG_EMU(printf("IO: IN(MEM_BANKSIZE)\r\n"));
+		return _mem.bank_size();
 	case TIMER:
 		return timer? 1: 0;
 	default:
@@ -92,13 +95,16 @@ void IO::out(uint16_t port, uint8_t a) {
 		// ignore?
 		break;
 	case MEM_INIT:
+		DBG_EMU(printf("IO: OUT(MEM_INIT, %x)\r\n", a));
 		_mem.begin(a);
 		break;
 	case MEM_SELECT:
+		DBG_EMU(printf("IO: OUT(MEM_SELECT, %x)\r\n", a));
 		_mem.select(a);
 		break;
-	case MEM_PAGES:
-		_mem.size(a);
+	case MEM_BANKSIZE:
+		DBG_EMU(printf("IO: OUT(MEM_BANKSIZE, %x)\r\n", a));
+		_mem.bank_size(a);
 		break;
 	case TIMER:
 		if (timer && !a) {

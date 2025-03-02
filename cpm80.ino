@@ -41,7 +41,7 @@ void reset(void) {
 	if (disk)
 		io.reset();
 	else
-		DBG(println(F("Disk initialisation failed")));
+		ERR(println(F("Disk initialisation failed")));
 
 	cpu.reset();
 }
@@ -75,5 +75,8 @@ void setup(void) {
 
 void loop(void) {
 
-	hardware_run();
+	if (!hardware_run()) {
+		ERR(printf("CPU halted at %04x\r\n", cpu.pc()));
+		for(;;) yield();
+	}
 }
