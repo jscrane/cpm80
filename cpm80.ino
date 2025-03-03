@@ -56,6 +56,8 @@ void function_key(uint8_t fn) {
 void setup(void) {
 	hardware_init(cpu);
 
+	io.register_timer_interrupt_handler([]() { cpu.raise(0xff); });
+
 #if defined(BRAM_PAGES)
 	for (unsigned i = 0; i < BRAM_PAGES; i++)
 		memory.put(boot[i], BRAM_BASE + 1024*i);

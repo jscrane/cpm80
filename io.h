@@ -46,6 +46,8 @@ public:
 	void out(uint16_t p, uint8_t b);
 
 	void reset();
+	void register_timer_interrupt_handler(std::function<void(void)> fn) { tick_handler = fn; }
+
 private:
 	serial_kbd &_kbd;
 	uint8_t kbd_poll();
@@ -61,7 +63,7 @@ private:
 	uint16_t setdma;
 	uint8_t dsk_status;
 
-	void tick();
+	std::function<void(void)> tick_handler;
 	uint8_t timer;
 
 	BankedMemory &_mem;

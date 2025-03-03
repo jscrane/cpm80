@@ -59,7 +59,7 @@ uint8_t IO::in(uint16_t port) {
 	case TIMER:
 		return timer? 1: 0;
 	default:
-		DBG(printf("IO: unhandled IN(%u)\r\n", port));
+		ERR(printf("IO: unhandled IN(%u)\r\n", port));
 		break;
 	}
 	return 0x00;
@@ -110,15 +110,11 @@ void IO::out(uint16_t port, uint8_t a) {
 		if (timer && !a) {
 			hardware_cancel_timer(timer);
 			timer = 0;
-		} else if (!timer && a)
-			timer = hardware_interval_timer(10, [this]() { tick(); });
+		} else if (!timer && a && tick_handler)
+			timer = hardware_interval_timer(10, tick_handler);
 		break;
 	default:
-		DBG(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
+		ERR(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
 		break;
 	}
-}
-
-void IO::tick() {
-	// NYI
 }
