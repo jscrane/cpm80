@@ -1,4 +1,4 @@
 A:cpm22-1.dsk 77 128 26
 B:cpm22-2.dsk 77 128 26
 C:cpm22-62khd.dsk 77 128 26
-
+D:z80tests.dsk 77 128 26
