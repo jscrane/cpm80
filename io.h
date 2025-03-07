@@ -4,7 +4,7 @@
 class serial_kbd;
 
 // input ports: A = IN(n)
-// (see https://st.sdf-eu.org/i8080/index.html)
+// (see https://github.com/udo-munk/z80pack/blob/master/cpmsim/srcsim/simio.c)
 #define CON_ST		0
 #define CON_IN		1
 #define FDC_GETTRK	11
@@ -23,7 +23,9 @@ class serial_kbd;
 #define FDC_SETSEC_H	17
 #define MEM_INIT	20
 #define MEM_SELECT	21
-#define MEM_PAGES	22
+#define MEM_BANKSIZE	22
+#define MEM_WP_COMMON	23
+#define TIMER		27
 
 // disk errors
 #define OK		0
@@ -45,6 +47,8 @@ public:
 	void out(uint16_t p, uint8_t b);
 
 	void reset();
+	void register_timer_interrupt_handler(std::function<void(void)> fn) { tick_handler = fn; }
+
 private:
 	serial_kbd &_kbd;
 	uint8_t kbd_poll();
@@ -59,6 +63,10 @@ private:
 	uint8_t settrk, setsec, trk, sec;
 	uint16_t setdma;
 	uint8_t dsk_status;
+
+	std::function<void(void)> tick_handler;
+	uint8_t timer;
+
 	BankedMemory &_mem;
 
 	serial_dsp &_dsp;

@@ -41,7 +41,7 @@ void reset(void) {
 	if (disk)
 		io.reset();
 	else
-		DBG(println(F("Disk initialisation failed")));
+		ERR(println(F("Disk initialisation failed")));
 
 	cpu.reset();
 }
@@ -55,6 +55,8 @@ void function_key(uint8_t fn) {
 
 void setup(void) {
 	hardware_init(cpu);
+
+	io.register_timer_interrupt_handler([]() { cpu.raise(0xff); });
 
 #if defined(BRAM_PAGES)
 	for (unsigned i = 0; i < BRAM_PAGES; i++)
@@ -75,5 +77,8 @@ void setup(void) {
 
 void loop(void) {
 
-	hardware_run();
+	if (!hardware_run()) {
+		ERR(printf("CPU halted at %04x\r\n", cpu.pc()));
+		for(;;) yield();
+	}
 }

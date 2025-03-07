@@ -47,8 +47,18 @@ uint8_t IO::in(uint16_t port) {
 		return setsec;
 	case FDC_GETTRK:
 		return settrk;
+	case MEM_INIT:
+		return _mem.num_banks();
+	case MEM_SELECT:
+		return _mem.selected();
+	case MEM_BANKSIZE:
+		return _mem.bank_size();
+	case MEM_WP_COMMON:
+		return _mem.wp_common();
+	case TIMER:
+		return timer? 1: 0;
 	default:
-		DBG(printf("IO: unhandled IN(%u)\r\n", port));
+		DBG_EMU(printf("IO: unhandled IN(%u)\r\n", port));
 		break;
 	}
 	return 0x00;
@@ -89,11 +99,21 @@ void IO::out(uint16_t port, uint8_t a) {
 	case MEM_SELECT:
 		_mem.select(a);
 		break;
-	case MEM_PAGES:
-		_mem.size(a);
+	case MEM_BANKSIZE:
+		_mem.bank_size(a);
+		break;
+	case MEM_WP_COMMON:
+		_mem.wp_common(a);
+		break;
+	case TIMER:
+		if (timer && !a) {
+			hardware_cancel_timer(timer);
+			timer = 0;
+		} else if (!timer && a && tick_handler)
+			timer = hardware_interval_timer(10, tick_handler);
 		break;
 	default:
-		DBG(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
+		DBG_EMU(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
 		break;
 	}
 }
