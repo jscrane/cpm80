@@ -24,6 +24,7 @@ class serial_kbd;
 #define MEM_INIT	20
 #define MEM_SELECT	21
 #define MEM_BANKSIZE	22
+#define MEM_WP_COMMON	23
 #define TIMER		27
 
 // disk errors

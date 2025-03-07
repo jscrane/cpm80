@@ -48,18 +48,17 @@ uint8_t IO::in(uint16_t port) {
 	case FDC_GETTRK:
 		return settrk;
 	case MEM_INIT:
-		DBG_EMU(printf("IO: IN(MEM_INIT)\r\n"));
 		return _mem.num_banks();
 	case MEM_SELECT:
-		DBG_EMU(printf("IO: IN(MEM_SELECT)\r\n"));
 		return _mem.selected();
 	case MEM_BANKSIZE:
-		DBG_EMU(printf("IO: IN(MEM_BANKSIZE)\r\n"));
 		return _mem.bank_size();
+	case MEM_WP_COMMON:
+		return _mem.wp_common();
 	case TIMER:
 		return timer? 1: 0;
 	default:
-		ERR(printf("IO: unhandled IN(%u)\r\n", port));
+		DBG_EMU(printf("IO: unhandled IN(%u)\r\n", port));
 		break;
 	}
 	return 0x00;
@@ -95,16 +94,16 @@ void IO::out(uint16_t port, uint8_t a) {
 		// ignore?
 		break;
 	case MEM_INIT:
-		DBG_EMU(printf("IO: OUT(MEM_INIT, %x)\r\n", a));
 		_mem.begin(a);
 		break;
 	case MEM_SELECT:
-		DBG_EMU(printf("IO: OUT(MEM_SELECT, %x)\r\n", a));
 		_mem.select(a);
 		break;
 	case MEM_BANKSIZE:
-		DBG_EMU(printf("IO: OUT(MEM_BANKSIZE, %x)\r\n", a));
 		_mem.bank_size(a);
+		break;
+	case MEM_WP_COMMON:
+		_mem.wp_common(a);
 		break;
 	case TIMER:
 		if (timer && !a) {
@@ -114,7 +113,7 @@ void IO::out(uint16_t port, uint8_t a) {
 			timer = hardware_interval_timer(10, tick_handler);
 		break;
 	default:
-		ERR(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
+		DBG_EMU(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
 		break;
 	}
 }
