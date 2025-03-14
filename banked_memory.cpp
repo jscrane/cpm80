@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#include <hardware.h>
 
 #if defined(BOARD_HAS_PSRAM)
 #include <esp32-hal-psram.h>
 #endif
 
 #include "memory.h"
+#include "debugging.h"
 #include "banked_memory.h"
 
 static BankedMemory::Bank **banks;

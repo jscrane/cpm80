@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <hardware.h>
 
 #if defined(USE_SD)
 #include <SD.h>
@@ -15,6 +14,7 @@
 #include <CPU.h>
 #include <display.h>
 #include <serial_dsp.h>
+#include <debugging.h>
 
 #include "config.h"
 #include "banked_memory.h"
