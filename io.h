@@ -39,7 +39,7 @@ class serial_kbd;
 
 class BankedMemory;
 
-class IO: public PortDevice, public Display {
+class IO: public Display {
 public:
 	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp): _mem(mem), _kbd(kbd), _dsp(dsp) {}
 

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <ports.h>
 #include <memory.h>
 #include <CPU.h>
 #include <display.h>

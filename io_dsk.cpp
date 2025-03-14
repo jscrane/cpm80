@@ -13,7 +13,6 @@
 
 #include <memory.h>
 #include <CPU.h>
-#include <ports.h>
 #include <display.h>
 #include <serial_dsp.h>
 
