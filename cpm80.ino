@@ -2,7 +2,6 @@
 #include <SPI.h>
 
 #include <r65emu.h>
-#include <ports.h>
 
 #include "config.h"
 #include PROCESSOR_H
@@ -25,7 +24,7 @@ hw_serial_dsp dsp(Serial);
 BankedMemory memory;
 
 IO io(memory, kbd, dsp);
-processor_t cpu(memory, io);
+processor_t cpu(memory);
 
 #if defined(BRAM_PAGES)
 ram<> boot[BRAM_PAGES];
@@ -54,9 +53,13 @@ void function_key(uint8_t fn) {
 }
 
 void setup(void) {
+
+	cpu.set_port_out_handler([](uint16_t port, uint8_t b) { io.out(port, b); });
+	cpu.set_port_in_handler([](uint16_t port) { return io.in(port); });
+
 	hardware_init(cpu);
 
-	io.register_timer_interrupt_handler([]() { cpu.raise(0xff); });
+	io.register_timer_interrupt_handler([]() { cpu.irq(0xff); });
 
 #if defined(BRAM_PAGES)
 	for (unsigned i = 0; i < BRAM_PAGES; i++)

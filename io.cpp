@@ -3,11 +3,11 @@
 #include <stddef.h>
 #include <memory.h>
 #include <CPU.h>
-#include <ports.h>
 #include <display.h>
 #include <serial_kbd.h>
 #include <serial_dsp.h>
 #include <hardware.h>
+#include <debugging.h>
 
 #include "banked_memory.h"
 #include "screen.h"
