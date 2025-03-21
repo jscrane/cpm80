@@ -10,8 +10,8 @@ aluop a,<ixh,ixl,iyh,iyl>.....  OK
 aluop a,(<ix,iy>+1)...........  OK
 bit n,(<ix,iy>+1).............  OK
 bit n,<b,c,d,e,h,l,(hl),a>....  OK
-cpd<r>........................  ERROR **** crc expected:134b622d found:41e840fa
-cpi<r>........................  ERROR **** crc expected:2da42d19 found:8a8e94ca
+cpd<r>........................  OK
+cpi<r>........................  OK
 <daa,cpl,scf,ccf>.............  OK
 <inc,dec> a...................  OK
 <inc,dec> b...................  OK
