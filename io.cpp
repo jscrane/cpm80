@@ -44,7 +44,9 @@ uint8_t IO::in(uint16_t port) {
 	case FDC_IODONE:
 		return 1;
 	case FDC_GETSEC_L:
-		return setsec;
+		return setsec & 0xff;
+	case FDC_GETSEC_H:
+		return (setsec & 0xff00) >> 8;
 	case FDC_GETTRK:
 		return settrk;
 	case MEM_INIT:
@@ -76,7 +78,10 @@ void IO::out(uint16_t port, uint8_t a) {
 		dsk_status = dsk_settrk(a);
 		break;
 	case FDC_SETSEC_L:
-		dsk_status = dsk_setsec(a);
+		dsk_status = dsk_setsec((setsec & 0xff00) | a);
+		break;
+	case FDC_SETSEC_H:
+		dsk_status = dsk_setsec(a << 8 | (setsec & 0xff));
 		break;
 	case FDC_SETDMA_L:
 		setdma = (setdma & 0xff00) | a;
@@ -89,9 +94,6 @@ void IO::out(uint16_t port, uint8_t a) {
 		break;
 	case CON_OUT:
 		_dsp.write(a);
-		break;
-	case FDC_SETSEC_H:
-		// ignore?
 		break;
 	case MEM_INIT:
 		_mem.begin(a);

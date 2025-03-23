@@ -11,6 +11,7 @@ class serial_kbd;
 #define FDC_GETSEC_L	12
 #define FDC_IODONE	13
 #define FDC_STATUS	14
+#define FDC_GETSEC_H	17
 
 // output ports: OUT(n, A)
 #define CON_OUT		1
@@ -59,8 +60,9 @@ private:
 	bool dsk_seek();
 	uint8_t dsk_select(uint8_t a);
 	uint8_t dsk_settrk(uint8_t a);
-	uint8_t dsk_setsec(uint8_t a);
-	uint8_t settrk, setsec, trk, sec;
+	uint8_t dsk_setsec(uint16_t a);
+	uint8_t settrk, trk;
+	uint16_t setsec, sec;
 	uint16_t setdma;
 	uint8_t dsk_status;
 

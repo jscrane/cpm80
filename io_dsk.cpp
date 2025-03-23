@@ -193,7 +193,7 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 }
 
 // sectors are numbered from 1
-uint8_t IO::dsk_setsec(uint8_t a) {
+uint8_t IO::dsk_setsec(uint16_t a) {
 
 	if (a > dp->sectrk) {
 		ERR(printf("setsec: %d\r\n", a));
