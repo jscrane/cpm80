@@ -30,6 +30,35 @@ uint8_t IO::kbd_poll() {
 	return c;
 }
 
+uint8_t IO::clk_data() {
+
+	uint32_t s = millis() / 1000;
+
+	switch (clkcmd) {
+	case 0:
+		return s % 60;
+
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+		DBG_EMU(printf("IO: unhandled clk_data(%u)\r\n", clkcmd));
+		break;
+	}
+	return 0x00;
+}
+
+void IO::clk_cmd(uint8_t cmd) {
+
+	clkcmd = cmd;
+
+	if (cmd == 0xff)
+		clkfmt = !clkfmt;
+}
+
 uint8_t IO::in(uint16_t port) {
 
 	port &= 0xff;
@@ -57,8 +86,16 @@ uint8_t IO::in(uint16_t port) {
 		return _mem.bank_size();
 	case MEM_WP_COMMON:
 		return _mem.wp_common();
+	case CLK_DATA:
+		return clk_data();
+	case CLK_CMD:
+		return clkfmt;
 	case TIMER:
 		return timer? 1: 0;
+	case CON1_ST:
+	case CON2_ST:
+	case NET1_ST:
+		return 0x00;	// ignore
 	default:
 		DBG_EMU(printf("IO: unhandled IN(%u)\r\n", port));
 		break;
@@ -113,6 +150,9 @@ void IO::out(uint16_t port, uint8_t a) {
 			timer = 0;
 		} else if (!timer && a && tick_handler)
 			timer = hardware_interval_timer(10, tick_handler);
+		break;
+	case CLK_CMD:
+		clk_cmd(a);
 		break;
 	default:
 		DBG_EMU(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));

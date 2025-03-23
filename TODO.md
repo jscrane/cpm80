@@ -26,14 +26,25 @@ __sfr __at 50 tty4stat;
 __sfr __at 51 tty4data;
 ```
 
+A received character is dispatched by ```tty_inproc()``` in ```Kernel/tty.c```.
+
+These are ignored at the moment. (All I/O is to the Console.)
+
 Clock:
 ======
 
-This is ```clkc_out``` on z80pack.
-
+This is ```clkc_out``` on z80pack:
 ```
 IO: unhandled OUT(25, 255)
 IO: unhandled OUT(25, 0)
 ```
 
-This arises from ```zrtc_init()``` in ```Kernel/dev/z80pack/devrtc.c```.
+These arise from ```zrtc_init()``` in ```Kernel/dev/z80pack/devrtc.c```.
+
+This is ```clkd_in``` on z80pack:
+```
+IO: unhandled IN(26)
+```
+
+See ```z80pack/iodevices/rtc80.c```. What is returned from this depends on the last
+command sent with ```clkc_out```.
