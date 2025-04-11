@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <hardware.h>
 
 #if defined(USE_SD)
 #include <SD.h>
