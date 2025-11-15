@@ -20,9 +20,11 @@ public:
 
 	uint8_t bank_size() const { return _bank_size >> 8; }
 
-	void wp_common(uint8_t wp) { _wp = wp; }
+	void wp_common(uint8_t wp);
 
-	uint8_t wp_common() const { return _wp; }
+	uint8_t wp_common() const;
+
+	void set_wp_fault_handler(std::function<void(void)> fn);
 
 	class Bank: public Memory::Device {
 	public:
@@ -37,7 +39,8 @@ public:
 	};
 
 private:
-	uint8_t _bank, _nbanks, _wp;
+	uint8_t _bank, _nbanks;
+
 	uint16_t _bank_size = DEFAULT_BANK_SIZE;
 };
 

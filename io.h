@@ -32,6 +32,7 @@ class serial_kbd;
 #define MEM_WP_COMMON	23
 #define CLK_CMD		25
 #define TIMER		27
+#define MONITOR		29
 
 // disk errors
 #define OK		0

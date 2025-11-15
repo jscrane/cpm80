@@ -154,6 +154,9 @@ void IO::out(uint16_t port, uint8_t a) {
 	case CLK_CMD:
 		clk_cmd(a);
 		break;
+	case MONITOR:
+		// FIXME: reboot is 0x01, monitor is 0x80
+		break;
 	default:
 		DBG_EMU(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
 		break;

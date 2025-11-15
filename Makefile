@@ -38,7 +38,7 @@ endif
 ifeq ($t, esp32)
 UPLOADSPEED := 921600
 TERMINAL_SPEED = 115200
-CPPFLAGS += -DUSE_UZ80
+CPPFLAGS += -DUSE_Z80
 LIBRARIES += FS Network
 
 ifeq ($b, lilygo)
