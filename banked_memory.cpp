@@ -1,21 +1,46 @@
 #include <Arduino.h>
 
-#if defined(BOARD_HAS_PSRAM)
-#include <esp32-hal-psram.h>
-#endif
-
 #include "memory.h"
 #include "debugging.h"
 #include "banked_memory.h"
 
+static class WriteProtect: public Memory::Device {
+public:
+	WriteProtect(): Memory::Device(0), _wp_common(0) {}
+
+	virtual void access(Memory::address addr) { _protect->access(addr); }
+
+	virtual void operator=(uint8_t b) {
+
+		if (_wp_common)
+			_wp_common |= 0x80;
+		else
+			(*_protect) = b;
+	}
+
+	virtual operator uint8_t() { return (uint8_t)(*_protect); }
+
+private:
+	friend class BankedMemory;
+
+	uint8_t _wp_common;
+
+	Device *_protect;
+} wp;
+
+uint8_t BankedMemory::wp_common() const { return wp._wp_common; }
+
+void BankedMemory::wp_common(uint8_t b) { wp._wp_common = b; }
+
 static BankedMemory::Bank **banks;
 
-Memory::Device *BankedMemory::get(address at) const {
+Memory::Device *BankedMemory::get(address addr) const {
 
-	if (_bank == 0 || at >= _bank_size)
-		return Memory::get(at);
+	if (addr < _bank_size)
+		return _bank > 0? banks[_bank]: Memory::get(addr);
 
-	return banks[_bank];
+	wp._protect = Memory::get(addr);
+	return &wp;
 }
 
 void BankedMemory::begin(uint8_t nbanks) {
@@ -32,11 +57,7 @@ BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 
 	DBG_MEM(printf("new bank %d bytes\r\n", bytes));
 
-#if defined(BOARD_HAS_PSRAM)
-	_mem = (uint8_t *)ps_malloc(bytes);
-#else
 	_mem = (uint8_t *)malloc(bytes);
-#endif
 	if (!_mem)
 		ERR(printf("malloc %d failed\r\n", bytes));
 }

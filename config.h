@@ -20,6 +20,9 @@
 #if defined(USE_Z80)
 #define PROCESSOR_H	"z80.h"
 typedef class z80 processor_t;
+#elif defined(USE_UZ80)
+#define PROCESSOR_H	"uz80.h"
+typedef class uz80 processor_t;
 #else
 #define PROCESSOR_H	"i8080.h"
 typedef class i8080 processor_t;

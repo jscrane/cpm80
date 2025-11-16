@@ -11,6 +11,11 @@ class serial_kbd;
 #define FDC_GETSEC_L	12
 #define FDC_IODONE	13
 #define FDC_STATUS	14
+#define FDC_GETSEC_H	17
+#define CLK_DATA	26
+#define CON1_ST		40
+#define CON2_ST		42
+#define NET1_ST		50
 
 // output ports: OUT(n, A)
 #define CON_OUT		1
@@ -25,7 +30,9 @@ class serial_kbd;
 #define MEM_SELECT	21
 #define MEM_BANKSIZE	22
 #define MEM_WP_COMMON	23
+#define CLK_CMD		25
 #define TIMER		27
+#define MONITOR		29
 
 // disk errors
 #define OK		0
@@ -59,13 +66,18 @@ private:
 	bool dsk_seek();
 	uint8_t dsk_select(uint8_t a);
 	uint8_t dsk_settrk(uint8_t a);
-	uint8_t dsk_setsec(uint8_t a);
-	uint8_t settrk, setsec, trk, sec;
+	uint8_t dsk_setsec(uint16_t a);
+	uint8_t settrk, trk;
+	uint16_t setsec, sec;
 	uint16_t setdma;
 	uint8_t dsk_status;
 
 	std::function<void(void)> tick_handler;
 	uint8_t timer;
+
+	uint8_t clk_data();
+	void clk_cmd(uint8_t);
+	uint8_t clkfmt, clkcmd;
 
 	BankedMemory &_mem;
 
