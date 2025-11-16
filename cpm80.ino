@@ -57,12 +57,6 @@ void setup(void) {
 	cpu.set_port_out_handler([](uint16_t port, uint8_t b) { io.out(port, b); });
 	cpu.set_port_in_handler([](uint16_t port) { return io.in(port); });
 
-	memory.set_wp_fault_handler([]() {
-#if defined(CPU_HAS_NMI)
-		cpu.nmi();
-#endif
-	});
-
 	hardware_init(cpu);
 
 	io.register_timer_interrupt_handler([]() { cpu.irq(0xff); });

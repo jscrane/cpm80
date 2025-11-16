@@ -1,9 +1,6 @@
 #if !defined(__BANKED_MEMORY_H__)
 #define __BANKED_MEMORY_H__
 
-// see z80pack/cpmsim/srcsim/memsim.c
-#define DEFAULT_BANK_SIZE (48 * 1024)
-
 class BankedMemory: public Memory {
 public:
 	virtual Device *get(address at) const;
@@ -24,8 +21,6 @@ public:
 
 	uint8_t wp_common() const;
 
-	void set_wp_fault_handler(std::function<void(void)> fn);
-
 	class Bank: public Memory::Device {
 	public:
 		Bank(unsigned bytes);
@@ -41,7 +36,7 @@ public:
 private:
 	uint8_t _bank, _nbanks;
 
-	uint16_t _bank_size = DEFAULT_BANK_SIZE;
+	uint16_t _bank_size;
 };
 
 #endif

@@ -12,13 +12,10 @@ public:
 
 	virtual void operator=(uint8_t b) {
 
-		if (!_wp_common) {
+		if (_wp_common)
+			_wp_common |= 0x80;
+		else
 			(*_protect) = b;
-			return;
-		}
-
-		_wp_common |= 0x80;
-		_fault_handler();
 	}
 
 	virtual operator uint8_t() { return (uint8_t)(*_protect); }
@@ -28,18 +25,12 @@ private:
 
 	uint8_t _wp_common;
 
-	Memory::address _addr;
-
 	Device *_protect;
-
-	std::function<void(void)> _fault_handler;
 } wp;
 
 uint8_t BankedMemory::wp_common() const { return wp._wp_common; }
 
 void BankedMemory::wp_common(uint8_t b) { wp._wp_common = b; }
-
-void BankedMemory::set_wp_fault_handler(std::function<void(void)> fn) { wp._fault_handler = fn; }
 
 static BankedMemory::Bank **banks;
 
