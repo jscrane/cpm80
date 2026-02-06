@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <stddef.h>
+
+#include <machine.h>
 #include <memory.h>
 #include <CPU.h>
 #include <display.h>
@@ -45,7 +47,7 @@ uint8_t IO::clk_data() {
 	case 5:
 	case 6:
 	case 7:
-		DBG_EMU(printf("IO: unhandled clk_data(%u)\r\n", clkcmd));
+		DBG_EMU("IO: unhandled clk_data(%u)", clkcmd);
 		break;
 	}
 	return 0x00;
@@ -97,7 +99,7 @@ uint8_t IO::in(uint16_t port) {
 	case NET1_ST:
 		return 0x00;	// ignore
 	default:
-		DBG_EMU(printf("IO: unhandled IN(%u)\r\n", port));
+		DBG_EMU("IO: unhandled IN(%u)", port);
 		break;
 	}
 	return 0x00;
@@ -146,19 +148,19 @@ void IO::out(uint16_t port, uint8_t a) {
 		break;
 	case TIMER:
 		if (timer && !a) {
-			hardware_cancel_timer(timer);
+			_machine->cancel_timer(timer);
 			timer = 0;
 		} else if (!timer && a && tick_handler)
-			timer = hardware_interval_timer(10, tick_handler);
+			timer = _machine->interval_timer(10, tick_handler);
 		break;
 	case CLK_CMD:
 		clk_cmd(a);
 		break;
 	case MONITOR:
-		ERR(printf("IO: monitor(%02x)\r\n", a));
+		ERR("IO: monitor(%02x)", a);
 		break;
 	default:
-		DBG_EMU(printf("IO: unhandled OUT(%u, %u)\r\n", port, a));
+		DBG_EMU("IO: unhandled OUT(%u, %u)", port, a);
 		break;
 	}
 }

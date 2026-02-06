@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <machine.h>
 #include <hardware.h>
 
 #if defined(USE_SD)
@@ -73,7 +74,7 @@ void IO::dsk_reset() {
 
 	File map = DISK.open(PROGRAMS "drivemap.txt", MODE_READ);
 	if (!map) {
-		ERR(println(F(PROGRAMS "drivemap.txt: open failed")));
+		ERR(PROGRAMS "drivemap.txt: open failed");
 		return;
 	}
 
@@ -156,7 +157,7 @@ uint8_t IO::dsk_write() {
 uint8_t IO::dsk_select(uint8_t a) {
 
 	if (!drive_letters[a]) {
-		ERR(printf("dsk_select: %d\r\n", a));
+		ERR("dsk_select: %d", a);
 		return ILLEGAL_DRIVE;
 	}
 
@@ -173,8 +174,7 @@ uint8_t IO::dsk_select(uint8_t a) {
 	snprintf(buf, sizeof(buf), PROGRAMS "%s", dp->image);
 	drive = DISK.open(buf, MODE_READWRITE);
 	if (!drive) {
-		ERR(print(buf));
-		ERR(println(F(": open failed")));
+		ERR("%s: open failed", buf);
 		return ILLEGAL_DRIVE;
 	}
 
@@ -185,7 +185,7 @@ uint8_t IO::dsk_select(uint8_t a) {
 uint8_t IO::dsk_settrk(uint8_t a) {
 
 	if (a >= dp->tracks) {
-		ERR(printf("settrk: %d\r\n", a));
+		ERR("settrk: %d\r\n", a);
 		return ILLEGAL_TRACK;
 	}
 
@@ -197,7 +197,7 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 uint8_t IO::dsk_setsec(uint16_t a) {
 
 	if (a > dp->sectrk) {
-		ERR(printf("setsec: %d\r\n", a));
+		ERR("setsec: %d\r\n", a);
 		return ILLEGAL_SECTOR;
 	}
 

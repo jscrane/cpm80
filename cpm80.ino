@@ -25,6 +25,7 @@ BankedMemory memory;
 
 IO io(memory, kbd, dsp);
 processor_t cpu(memory);
+Arduino machine(cpu);
 
 #if defined(BRAM_PAGES)
 ram<> boot[BRAM_PAGES];
@@ -34,22 +35,19 @@ ram<> boot[BRAM_PAGES];
 ram<> pages[RAM_PAGES];
 #endif
 
-void reset(void) {
-	bool disk = hardware_reset();
+static void reset(bool disk) {
 
 	if (disk)
 		io.reset();
 	else
 		ERR(println(F("Disk initialisation failed")));
-
-	cpu.reset();
 }
 
-void function_key(uint8_t fn) {
+static void function_key(uint8_t fn) {
 	if (fn == 1)
-		reset();
+		machine.reset();
 	else if (fn == 10)
-		hardware_debug_cpu();
+		machine.debug_cpu();
 }
 
 void setup(void) {
@@ -57,9 +55,10 @@ void setup(void) {
 	cpu.set_port_out_handler([](uint16_t port, uint8_t b) { io.out(port, b); });
 	cpu.set_port_in_handler([](uint16_t port) { return io.in(port); });
 
-	hardware_init(cpu);
+	machine.begin();
 
 	io.register_timer_interrupt_handler([]() { cpu.irq(0xff); });
+	kbd.register_fnkey_handler(function_key);
 
 #if defined(BRAM_PAGES)
 	for (unsigned i = 0; i < BRAM_PAGES; i++)
@@ -73,15 +72,11 @@ void setup(void) {
 	for (unsigned i = 0; i < RAM_PAGES; i++)
 		memory.put(pages[i], RAM_BASE + 1024*i);
 
-	kbd.register_fnkey_handler(function_key);
-
-	reset();
+	machine.register_reset_handler(reset);
+	machine.reset();
 }
 
 void loop(void) {
 
-	if (!hardware_run()) {
-		ERR(printf("CPU halted at %04x\r\n", cpu.pc()));
-		for(;;) yield();
-	}
+	machine.run(10);
 }

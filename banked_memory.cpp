@@ -1,7 +1,10 @@
-#include <Arduino.h>
+#include <stdint.h>
+#include <malloc.h>
 
-#include "memory.h"
-#include "debugging.h"
+#include <machine.h>
+#include <memory.h>
+#include <debugging.h>
+
 #include "banked_memory.h"
 
 static class WriteProtect: public Memory::Device {
@@ -45,7 +48,7 @@ Memory::Device *BankedMemory::get(address addr) const {
 
 void BankedMemory::begin(uint8_t nbanks) {
 
-	DBG_MEM(printf("%d banks\r\n", nbanks));
+	DBG_MEM("%d banks", nbanks);
 
 	_nbanks = nbanks;
 	banks = new BankedMemory::Bank*[nbanks];
@@ -55,11 +58,11 @@ void BankedMemory::begin(uint8_t nbanks) {
 
 BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 
-	DBG_MEM(printf("new bank %d bytes\r\n", bytes));
+	DBG_MEM("new bank %d bytes", bytes);
 
-	_mem = (uint8_t *)malloc(bytes);
+	_mem = (uint8_t *)calloc(bytes, 1);
 	if (!_mem)
-		ERR(printf("malloc %d failed\r\n", bytes));
+		ERR("calloc %d failed", bytes);
 }
 
 BankedMemory::Bank::~Bank() {

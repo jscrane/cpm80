@@ -1,9 +1,13 @@
 #include <Arduino.h>
+#include <functional>
+
+#include <machine.h>
 #include <memory.h>
 #include <CPU.h>
 #include <display.h>
 #include <serial_dsp.h>
 #include <hardware.h>
+#include <debugging.h>
 
 #include "config.h"
 #include "screen.h"
@@ -34,7 +38,7 @@ void screen::reset() {
 	if (rows > ROWS) rows = ROWS;
 	cols = screenWidth() / charWidth();
 	if (cols > COLS) cols = COLS;
-	DBG(printf("screen %ux%u\r\n", cols, rows));
+	DBG_DSP("screen %ux%u", cols, rows);
 	Display::setScreen(cols * charWidth(), rows * charHeight());
 	clear();
 }
@@ -133,7 +137,7 @@ void screen::write(uint8_t b) {
 
 			default:
 				// ???
-				DBG(println(ch));
+				DBG_DSP("%x", ch);
 				break;
 			}
 
