@@ -24,9 +24,7 @@ void IO::reset() {
 uint8_t IO::kbd_poll() {
 	uint8_t c;
 	do {
-#if !defined(Energia_h)
 		yield();
-#endif
 		c = _kbd.read();
 	} while (c == 0xff);
 	return c;

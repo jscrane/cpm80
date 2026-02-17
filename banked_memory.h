@@ -1,5 +1,4 @@
-#if !defined(__BANKED_MEMORY_H__)
-#define __BANKED_MEMORY_H__
+#pragma once
 
 class BankedMemory: public Memory {
 public:
@@ -38,5 +37,3 @@ private:
 
 	uint16_t _bank_size;
 };
-
-#endif

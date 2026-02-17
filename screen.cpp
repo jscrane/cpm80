@@ -16,7 +16,7 @@
 #define ROWS	24
 #define COLS	80
 
-#if defined(SCREEN_SERIAL_DSP)
+#if !defined(USE_HOST_DISPLAY)
 static unsigned r, c;
 static unsigned rows, cols;
 static char buf[ROWS][COLS];

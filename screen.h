@@ -1,5 +1,4 @@
-#if !defined(__SCREEN_H__)
-#define __SCREEN_H__
+#pragma once
 
 class screen: public Display, public serial_dsp {
 public:
@@ -12,5 +11,3 @@ private:
 	bool _esc, _ansi;
 	unsigned _value, _line;
 };
-
-#endif

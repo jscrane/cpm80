@@ -8,16 +8,16 @@
 #include "screen.h"
 #include "io.h"
 
-#if defined(PS2_SERIAL_KBD)
-ps2_serial_kbd kbd;
-#else
+#if defined(USE_HOST_KBD)
 hw_serial_kbd kbd(Serial);
+#else
+ps2_serial_kbd kbd;
 #endif
 
-#if defined(SCREEN_SERIAL_DSP)
-screen dsp;
-#else
+#if defined(USE_HOST_DISPLAY)
 hw_serial_dsp dsp(Serial);
+#else
+screen dsp;
 #endif
 
 #include "banked_memory.h"
@@ -40,7 +40,7 @@ static void reset(bool disk) {
 	if (disk)
 		io.reset();
 	else
-		ERR(println(F("Disk initialisation failed")));
+		ERR("Disk initialisation failed");
 }
 
 static void function_key(uint8_t fn) {

@@ -1,5 +1,4 @@
-#ifndef __IO_H__
-#define __IO_H__
+#pragma once
 
 class serial_kbd;
 
@@ -83,5 +82,3 @@ private:
 
 	serial_dsp &_dsp;
 };
-
-#endif

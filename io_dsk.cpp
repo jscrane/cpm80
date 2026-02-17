@@ -4,12 +4,20 @@
 
 #if defined(USE_SD)
 #include <SD.h>
+#define DISK SD
+
 #elif defined(USE_SPIFFS)
 #include <FS.h>
 #include <SPIFFS.h>
+#define DISK SPIFFS
+
 #elif defined(USE_LITTLEFS)
 #include <FS.h>
 #include <LittleFS.h>
+#define DISK LittleFS
+
+#else
+#error "This application requires storage. (Did you configure hw/user.h?)"
 #endif
 
 #include <memory.h>
@@ -27,26 +35,11 @@ static File drive;
 #define IMAGE_LEN	20
 #define DRIVE_LETTERS	26
 
-#if defined(USE_SD)
-#define DISK SD
-#elif defined(USE_SPIFFS)
-#define DISK SPIFFS
-#elif defined(USE_LITTLEFS)
-#define DISK LittleFS
-#endif
-
-#if defined(ENERGIA_ARCH_tivac)
-#define MODE_READ	O_READ
-#define MODE_READWRITE	(O_READ | O_WRITE)
-
-#else
 #define MODE_READ	"r"
 #if defined(USE_LITTLEFS) && defined(LITTLEFS_READ_MODE)
 #define MODE_READWRITE	LITTLEFS_READ_MODE
 #else
 #define MODE_READWRITE	"r+"
-#endif
-
 #endif
 
 typedef struct disk_parameters {
@@ -99,7 +92,7 @@ void IO::dsk_reset() {
 		p->tracks = read_unsigned(map);
 		p->seclen = read_unsigned(map);
 		p->sectrk = read_unsigned(map);
-		DBG(printf("%s: %d %d %d\r\n", p->image, p->tracks, p->seclen, p->sectrk));
+		DBG_DISK("%s: %d %d %d\r\n", p->image, p->tracks, p->seclen, p->sectrk);
 	}
 	map.close();
 

@@ -1,5 +1,4 @@
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#pragma once
 
 // max number of entries in drivemap.txt
 // hardwired into BIOS:
@@ -27,10 +26,6 @@ typedef class uz80 processor_t;
 #define PROCESSOR_H	"i8080.h"
 typedef class i8080 processor_t;
 #endif
-
-// uncomment to use TFT / VGA display
-// otherwise serial terminal is used
-//#define SCREEN_SERIAL_DSP
 
 // boot RAM (cpm and cbios)
 // we _must_ have memory above $BRAM_BASE
@@ -62,6 +57,4 @@ typedef class i8080 processor_t;
 #define ORIENT	reverse_landscape
 #else
 #define ORIENT	landscape
-#endif
-
 #endif
