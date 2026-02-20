@@ -5,7 +5,6 @@
 
 #include "config.h"
 #include PROCESSOR_H
-#include "screen.h"
 #include "io.h"
 
 #if defined(USE_HOST_KBD)
@@ -17,13 +16,14 @@ ps2_serial_kbd kbd;
 #if defined(USE_HOST_DISPLAY)
 hw_serial_dsp dsp(Serial);
 #else
-screen dsp;
+#include "screen.h"
+screen screen;
 #endif
 
 #include "banked_memory.h"
 BankedMemory memory;
 
-IO io(memory, kbd, dsp);
+IO io(memory, kbd, screen);
 processor_t cpu(memory);
 Arduino machine(cpu);
 
@@ -37,10 +37,11 @@ ram<> pages[RAM_PAGES];
 
 static void reset(bool disk) {
 
-	if (disk)
-		io.reset();
-	else
+	io.reset();
+	if (!disk) {
 		ERR("Disk initialisation failed");
+		screen.status("Disk initialisation failed!");
+	}
 }
 
 static void function_key(uint8_t fn) {

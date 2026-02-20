@@ -12,7 +12,6 @@
 #include <debugging.h>
 
 #include "banked_memory.h"
-#include "screen.h"
 #include "io.h"
 
 void IO::reset() {

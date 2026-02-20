@@ -9,6 +9,8 @@
 #include <hardware.h>
 #include <debugging.h>
 
+#if !defined(USE_HOST_DISPLAY)
+
 #include "config.h"
 #include "screen.h"
 #include "io.h"
@@ -16,7 +18,6 @@
 #define ROWS	24
 #define COLS	80
 
-#if !defined(USE_HOST_DISPLAY)
 static unsigned r, c;
 static unsigned rows, cols;
 static char buf[ROWS][COLS];
@@ -26,27 +27,27 @@ void screen::clear() {
 	for (unsigned j = 0; j < ROWS; j++)
 		for (unsigned i = 0; i < COLS; i++)
 			buf[j][i] = ' ';
-	Display::clear();
+	display.clear();
 }
 
 void screen::reset() {
 	_esc = _ansi = false;
 	_line = _value = 0;
 
-	Display::begin(BG_COLOUR, FG_COLOUR, ORIENT);
-	rows = screenHeight() / charHeight();
+	display.begin(BG_COLOUR, FG_COLOUR, ORIENT);
+	rows = display.height() / display.charHeight();
 	if (rows > ROWS) rows = ROWS;
-	cols = screenWidth() / charWidth();
+	cols = display.width() / display.charWidth();
 	if (cols > COLS) cols = COLS;
 	DBG_DSP("screen %ux%u", cols, rows);
-	Display::setScreen(cols * charWidth(), rows * charHeight());
+	display.setScreenChars(cols, rows);
 	clear();
 }
 
 void screen::draw(char ch, unsigned i, unsigned j) {
 	if (buf[j][i] != ch) {
-		char s[] = { ch, 0 };
-		Display::drawString(s, i * charWidth(), j * charHeight());
+		display.setCursor(i * display.charWidth(), j * display.charHeight());
+		display.print(ch);
 		buf[j][i] = ch;
 	}
 }

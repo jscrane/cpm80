@@ -56,5 +56,5 @@ typedef class i8080 processor_t;
 #if defined(USE_ESPI)
 #define ORIENT	reverse_landscape
 #else
-#define ORIENT	landscape
+#define ORIENT	portrait
 #endif

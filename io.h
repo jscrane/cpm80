@@ -45,7 +45,7 @@ class serial_kbd;
 
 class BankedMemory;
 
-class IO: public Display {
+class IO {
 public:
 	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp): _mem(mem), _kbd(kbd), _dsp(dsp) {}
 
