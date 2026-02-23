@@ -14,7 +14,7 @@ ps2_serial_kbd kbd;
 #endif
 
 #if defined(USE_HOST_DISPLAY)
-hw_serial_dsp dsp(Serial);
+hw_serial_dsp screen(Serial);
 #else
 #include "screen.h"
 screen screen;
