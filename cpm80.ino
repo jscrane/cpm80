@@ -61,20 +61,14 @@ void setup(void) {
 	io.register_timer_interrupt_handler([]() { cpu.irq(0xff); });
 	kbd.register_fnkey_handler(function_key);
 
-#if defined(BRAM_PAGES)
-	DBG_INI("BRAM:	%dkB at 0x0000", BRAM_PAGES);
-	for (unsigned i = 0; i < BRAM_PAGES; i++)
-		memory.put(boot[i], BRAM_BASE + 1024*i);
-#endif
-
-#if defined(USE_SPIRAM)
-	DBG_INI("SpiRAM: %dkB at 0x%04x", SPIRAM_EXTENT * Memory::page_size / 1024, SPIRAM_BASE);
-	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT * Memory::page_size);
-#endif
-
 	DBG_INI("RAM:	%dkB at 0x%04x", RAM_PAGES, RAM_BASE);
 	for (unsigned i = 0; i < RAM_PAGES; i++)
 		memory.put(pages[i], RAM_BASE + 1024*i);
+
+#if defined(USE_SPIRAM)
+	DBG_INI("SpiRAM: %dkB at 0x%04x", SPIRAM_EXTENT / 1024, SPIRAM_BASE);
+	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT);
+#endif
 
 	machine.register_reset_handler(reset);
 	machine.reset();

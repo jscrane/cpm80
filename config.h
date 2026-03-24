@@ -27,28 +27,10 @@ typedef class uz80 processor_t;
 typedef class i8080 processor_t;
 #endif
 
-// boot RAM (cpm and cbios)
-// we _must_ have memory above $BRAM_BASE
-#define BRAM_BASE	0xe400u
-#define CPM_BASE	BRAM_BASE
-#define CBIOS_BASE	0xfa00u
-
-#if (SPIRAM_SIZE + RAM_SIZE >= 0x10000u)
-
-// we can fill the entire 64kB address space
 #define RAM_BASE	0x0000u
 #define RAM_PAGES	(RAM_SIZE / ram<>::page_size)
 #define SPIRAM_BASE	RAM_SIZE
-#define SPIRAM_EXTENT	(0x10000u - RAM_SIZE) / Memory::page_size
-#else
-
-// we need to leave a gap below $BRAM_BASE
-#define BRAM_PAGES	(0x10000 - BRAM_BASE) / ram<>::page_size
-#define RAM_BASE	0x0000u
-#define RAM_PAGES	(RAM_SIZE / ram<>::page_size - BRAM_PAGES)
-#define SPIRAM_BASE	RAM_PAGES * ram<>::page_size
-#define SPIRAM_EXTENT	min(SPIRAM_SIZE, BRAM_BASE - SPIRAM_BASE) / Memory::page_size
-#endif
+#define SPIRAM_EXTENT	(0x10000u - RAM_SIZE)
 
 #define BG_COLOUR	BLACK
 #define FG_COLOUR	WHITE
