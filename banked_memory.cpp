@@ -58,13 +58,16 @@ void BankedMemory::begin(uint8_t nbanks) {
 
 BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 
+	if (bytes == 0) bytes = 48*1024;
+
 	DBG_MEM("new bank %d bytes", bytes);
 
-	_mem = (uint8_t *)calloc(bytes, 1);
+	_mem = (uint8_t *)malloc(bytes);
 	if (!_mem)
-		ERR("calloc %d failed", bytes);
+		ERR("malloc %d failed", bytes);
 }
 
 BankedMemory::Bank::~Bank() {
-	free(_mem);
+
+	if (_mem) free(_mem);
 }
