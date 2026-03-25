@@ -27,10 +27,6 @@ IO io(memory, kbd, screen);
 processor_t cpu(memory);
 Arduino machine(cpu);
 
-#if defined(BRAM_PAGES)
-ram<> boot[BRAM_PAGES];
-#endif
-
 #if defined(RAM_PAGES)
 ram<> pages[RAM_PAGES];
 #endif
