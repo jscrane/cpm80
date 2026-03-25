@@ -30,17 +30,13 @@
 #include "banked_memory.h"
 #include "io.h"
 
-static File drive;
-
 #define IMAGE_LEN	20
 #define DRIVE_LETTERS	26
 
 #define MODE_READ	"r"
-#if defined(USE_LITTLEFS) && defined(LITTLEFS_READ_MODE)
-#define MODE_READWRITE	LITTLEFS_READ_MODE
-#else
 #define MODE_READWRITE	"r+"
-#endif
+
+static File drive;
 
 typedef struct disk_parameters {
 	uint8_t tracks, seclen;
@@ -48,8 +44,8 @@ typedef struct disk_parameters {
 	char image[IMAGE_LEN];
 } disk_params_t;
 
-disk_params_t disk_params[DRIVES];
-disk_params_t *drive_letters[DRIVE_LETTERS], *dp;
+static disk_params_t disk_params[DRIVES];
+static disk_params_t *drive_letters[DRIVE_LETTERS], *dp;
 
 static unsigned read_unsigned(File map) {
 	unsigned u = 0;
@@ -92,7 +88,7 @@ void IO::dsk_reset() {
 		p->tracks = read_unsigned(map);
 		p->seclen = read_unsigned(map);
 		p->sectrk = read_unsigned(map);
-		DBG_DISK("%s: %d %d %d\r\n", p->image, p->tracks, p->seclen, p->sectrk);
+		DBG_DISK("%s: %d %d %d", p->image, p->tracks, p->seclen, p->sectrk);
 	}
 	map.close();
 
@@ -118,14 +114,17 @@ bool IO::dsk_seek() {
 
 uint8_t IO::dsk_read() {
 
-	if (!dsk_seek())
+	if (!dsk_seek()) {
+		ERR("dsk_read: seek error");
 		return SEEK_ERROR;
+	}
 
 	uint8_t buf[dp->seclen];
 	int n = drive.read(buf, sizeof(buf));
-	if (n < 0)
+	if (n < 0 || n != sizeof(buf)) {
+		ERR("dsk_read: read error");
 		return READ_ERROR;
-
+	}
 	for (int i = 0; i < n; i++)
 		_mem[setdma + i] = buf[i];
 	sec++;
@@ -134,15 +133,20 @@ uint8_t IO::dsk_read() {
 
 uint8_t IO::dsk_write() {
 
-	if (!dsk_seek())
+	if (!dsk_seek()) {
+		ERR("dsk_write: seek error");
 		return SEEK_ERROR;
+	}
 
 	uint8_t buf[dp->seclen];
 	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = _mem[setdma + i];
+
 	int n = drive.write(buf, sizeof(buf));
-	if (n < 0)
+	if (n < 0 || n != sizeof(buf)) {
+		ERR("dsk_write: write error");
 		return WRITE_ERROR;
+	}
 	sec++;
 	return OK;
 }
@@ -158,12 +162,11 @@ uint8_t IO::dsk_select(uint8_t a) {
 		return OK;
 
 	dp = drive_letters[a];
-
 	trk = sec = 0xff;
 	if (drive)
 		drive.close();
 
-	char buf[32];
+	char buf[64];
 	snprintf(buf, sizeof(buf), PROGRAMS "%s", dp->image);
 	drive = DISK.open(buf, MODE_READWRITE);
 	if (!drive) {
@@ -178,7 +181,7 @@ uint8_t IO::dsk_select(uint8_t a) {
 uint8_t IO::dsk_settrk(uint8_t a) {
 
 	if (a >= dp->tracks) {
-		ERR("settrk: %d\r\n", a);
+		ERR("settrk: %d", a);
 		return ILLEGAL_TRACK;
 	}
 
@@ -190,7 +193,7 @@ uint8_t IO::dsk_settrk(uint8_t a) {
 uint8_t IO::dsk_setsec(uint16_t a) {
 
 	if (a > dp->sectrk) {
-		ERR("setsec: %d\r\n", a);
+		ERR("setsec: %d", a);
 		return ILLEGAL_SECTOR;
 	}
 

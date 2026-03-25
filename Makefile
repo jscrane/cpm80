@@ -10,10 +10,21 @@ FS_DIR := disks/$p
 SD_DIR := \"/$p/\"
 
 ifeq ($t, rp2040)
+
+ifeq ($b, dvi)
 BOARD := adafruit_feather_dvi
 flash := 8388608_2097152
 CPPFLAGS += -DUSE_HOST_KBD -DDVI_BIT_DEPTH=1 -DDVI_RESOLUTION=DVI_RES_640x240p60
 LIBRARIES += LittleFS PicoDVI
+
+else
+BOARD := rpipico
+flash := 2097152_1048576
+dbglvl := All
+dbgport := Serial
+CPPFLAGS += -DUSE_HOST_KBD -DUSE_HOST_DISPLAY
+LIBRARIES += LittleFS
+endif
 endif
 
 ifeq ($t, esp8266)
