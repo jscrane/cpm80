@@ -40,11 +40,13 @@ static void reset(bool disk) {
 	}
 }
 
+static bool debug_cpu;
+
 static void function_key(uint8_t fn) {
 	if (fn == 1)
 		machine.reset();
 	else if (fn == 10)
-		machine.debug_cpu();
+		debug_cpu = !debug_cpu;
 }
 
 void setup(void) {
@@ -66,6 +68,7 @@ void setup(void) {
 	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT);
 #endif
 
+	machine.set_cpu_debugging([]() { return debug_cpu; });
 	machine.register_reset_handler(reset);
 	machine.reset();
 }
