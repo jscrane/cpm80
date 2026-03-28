@@ -51,14 +51,12 @@ void BankedMemory::begin(uint8_t nbanks) {
 	DBG_MEM("%d banks", nbanks);
 
 	_nbanks = nbanks;
-	banks = new BankedMemory::Bank*[nbanks];
-	for (int i = 1; i < nbanks; i++)
+	banks = new BankedMemory::Bank*[nbanks+1];
+	for (int i = 1; i <= nbanks; i++)
 		banks[i] = new Bank(_bank_size);
 }
 
 BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
-
-	if (bytes == 0) bytes = 48*1024;
 
 	DBG_MEM("new bank %d bytes", bytes);
 

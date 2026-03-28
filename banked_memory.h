@@ -2,7 +2,7 @@
 
 class BankedMemory: public Memory {
 public:
-	virtual Device *get(address at) const;
+	Device *get(address at) const override;
 
 	void begin(uint8_t nbanks);
 
@@ -35,5 +35,5 @@ public:
 private:
 	uint8_t _bank, _nbanks;
 
-	uint16_t _bank_size;
+	uint16_t _bank_size = 48*1024;
 };

@@ -4,7 +4,7 @@ p ?= cpm22
 TERMINAL_SPEED := 115200
 #TERMINAL_EXTRA_FLAGS := -C serialout.txt
 CPPFLAGS = -O3 -DUNDOCUMENTED_OPS
-CPPFLAGS += -DDEBUGGING=0x2ff -DCPU_DEBUG=false
+#CPPFLAGS += -DDEBUGGING=0x2ff
 LIBRARIES = SimpleTimer Adafruit_GFX Adafruit_BusIO Wire
 FS_DIR := disks/$p
 SD_DIR := \"/$p/\"
