@@ -1,0 +1,3 @@
+A:ucsd-iv-1.dsk 77 128 26
+B:ucsd-iv-2.dsk 77 128 26
+C:ucsd-iv-interp.dsk 77 128 26
