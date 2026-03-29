@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <machine.h>
 #include <hardware.h>
 

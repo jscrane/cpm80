@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -23,7 +22,7 @@ void IO::reset() {
 uint8_t IO::kbd_poll() {
 	uint8_t c;
 	do {
-		yield();
+		_machine->yield();
 		c = _kbd.read();
 	} while (c == 0xff);
 	return c;

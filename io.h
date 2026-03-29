@@ -47,7 +47,7 @@ class BankedMemory;
 
 class IO {
 public:
-	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp): _mem(mem), _kbd(kbd), _dsp(dsp) {}
+	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp): _kbd(kbd), _mem(mem), _dsp(dsp) {}
 
 	uint8_t in(uint16_t p);
 	void out(uint16_t p, uint8_t b);
