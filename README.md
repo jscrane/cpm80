@@ -1,7 +1,7 @@
-CP/M-80
-=======
+CP/M
+====
 
-CP/M 8080 hardware emulator on Stellarpad, ESP8266 and ESP32, using [r65emu](jscrane/r65emu).
+CP/M hardware emulator on Pico, ESP8266 and ESP32, using [r65emu](jscrane/r65emu).
 
 - Digital Research manual for [CP/M 2.2](http://www.gaby.de/cpm/manuals/archive/cpm22htm/)
 - useful info [here](http://cpuville.com/Code/CPM-on-a-new-computer.html)
@@ -60,7 +60,7 @@ The ROMs were loaded at addresses ```0xe400``` (cpm22) and ```0xfa00``` (cbios),
 Booting CP/M from disk
 ----------------------
 
-The next system loads CP/M from disk, as nature intended. The boot disk ```cpma.cpm``` comes
+The next system loaded CP/M from disk, as nature intended. The boot disk ```cpma.cpm``` comes
 from the excellent [emu8080](https://st.sdf-eu.org/i8080/index.html).
 
 A modified 8080 port-mapping supports the BIOS found on this disk (see ```io.cpp```). The file
@@ -77,8 +77,14 @@ $ mkfs.cpm -b system.bin foo.cpm
 z80pack
 -------
 
-A later implementation used a bootable system image produced by [putsys](https://github.com/udo-munk/z80pack/tree/master/cpmsim/srccpm2)
+The current implementation uses a bootable system image produced by [putsys](https://github.com/udo-munk/z80pack/tree/master/cpmsim/srccpm2)
 from [z80pack](https://github.com/udo-munk/z80pack) in conjunction with ```mkfs.cpm``` from ```cpmtools```.
+
+The emulation is now actually of the machine defined by `z80pack` and has successfully booted:
+- CP/M 2.2 and 3.0
+- [MP/M](https://en.wikipedia.org/wiki/MP/M)
+- [UCSD-IV](https://hackaday.com/2025/04/21/remembering-ucsd-p-system-the-pascal-virtual-machine/)
+- [Fuzix](https://github.com/etchedpixels/fuzix)
 
 This [BIOS](https://github.com/udo-munk/z80pack/blob/master/cpmsim/srccpm2/bios.asm) has support for hard-disk images (4MB).
 
