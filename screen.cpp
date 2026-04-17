@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <functional>
 
 #include <machine.h>
