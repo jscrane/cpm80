@@ -5,17 +5,18 @@ TERMINAL_SPEED := 115200
 #TERMINAL_EXTRA_FLAGS := -C serialout.txt
 CPPFLAGS = -O3 -DUNDOCUMENTED_OPS
 #CPPFLAGS += -DDEBUGGING=0x2ff
-LIBRARIES = SimpleTimer Adafruit_GFX Adafruit_BusIO Wire
+LIBRARIES = Adafruit_GFX Adafruit_BusIO Wire
 FS_DIR := disks/$p
 SD_DIR := \"/$p/\"
 
 ifeq ($t, rp2040)
+LIBRARIES += LittleFS
 
 ifeq ($b, dvi)
 BOARD := adafruit_feather_dvi
 flash := 8388608_2097152
 CPPFLAGS += -DUSE_HOST_KBD -DDVI_BIT_DEPTH=1 -DDVI_RESOLUTION=DVI_RES_640x240p60
-LIBRARIES += LittleFS PicoDVI
+LIBRARIES += PicoDVI
 
 else
 BOARD := rpipico
@@ -23,7 +24,6 @@ flash := 2097152_1048576
 dbglvl := All
 dbgport := Serial
 CPPFLAGS += -DUSE_HOST_KBD -DUSE_HOST_DISPLAY
-LIBRARIES += LittleFS
 endif
 endif
 
@@ -67,7 +67,7 @@ else
 BOARD := lolin32
 CPPFLAGS += -DUSER_SETUP_LOADED -DILI9341_DRIVER -DTFT_CS=5 -DTFT_DC=2 -DTFT_RST=-1 -DSPI_FREQUENCY=40000000 -DLOAD_GLCD \
 	-DHARDWARE_H=\"hw/esp32-example.h\" -DUSE_HOST_KBD
-LIBRARIES += TFT_eSPI SPIFFS
+LIBRARIES += TFT_eSPI LittleFS
 endif
 endif
 

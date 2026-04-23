@@ -72,7 +72,7 @@ private:
 	uint8_t dsk_status;
 
 	std::function<void(void)> tick_handler;
-	uint8_t timer;
+	int8_t timer = -1;
 
 	uint8_t clk_data();
 	void clk_cmd(uint8_t);

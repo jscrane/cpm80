@@ -47,6 +47,8 @@ static void function_key(uint8_t fn) {
 		machine.reset();
 	else if (fn == 10)
 		debug_cpu = !debug_cpu;
+	else if (fn == 11)
+		screen.statusf("%dHz", machine.current_speed());
 }
 
 void setup(void) {
@@ -75,5 +77,5 @@ void setup(void) {
 
 void loop(void) {
 
-	machine.run(10);
+	machine.run();
 }

@@ -144,11 +144,11 @@ void IO::out(uint16_t port, uint8_t a) {
 		_mem.wp_common(a);
 		break;
 	case TIMER:
-		if (timer && !a) {
+		if (timer >= 0 && !a) {
 			_machine->cancel_timer(timer);
-			timer = 0;
+			timer = -1;
 		} else if (!timer && a && tick_handler)
-			timer = _machine->interval_timer(10, tick_handler);
+			timer = _machine->interval_timer(10000, tick_handler);
 		break;
 	case CLK_CMD:
 		clk_cmd(a);
