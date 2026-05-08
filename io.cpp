@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -31,7 +30,7 @@ uint8_t IO::kbd_poll() {
 
 uint8_t IO::clk_data() {
 
-	uint32_t s = millis() / 1000;
+	uint32_t s = _machine->microseconds() / 1000000;
 
 	switch (clkcmd) {
 	case 0:
