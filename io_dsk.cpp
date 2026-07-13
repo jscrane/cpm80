@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-#include <machine.h>
 #include <hardware.h>
 
 #if defined(USE_SD)
@@ -22,7 +21,6 @@
 #endif
 
 #include <memory.h>
-#include <CPU.h>
 #include <display.h>
 #include <serial_dsp.h>
 #include <debugging.h>

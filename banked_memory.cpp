@@ -23,6 +23,9 @@ public:
 
 	virtual operator uint8_t() { return (uint8_t)(*_protect); }
 
+	void checkpoint(Checkpoint &) override { /* FIXME */ }
+	void restore(Checkpoint &) override { /* FIXME */ }
+
 private:
 	friend class BankedMemory;
 
@@ -56,6 +59,22 @@ void BankedMemory::begin(uint8_t nbanks) {
 		banks[i] = new Bank(_bank_size);
 }
 
+void BankedMemory::checkpoint(Checkpoint &c) {
+
+	Memory::checkpoint(c);
+	for (int i = 1; i <= _nbanks; i++)
+		banks[i]->checkpoint(c);
+	wp.checkpoint(c);
+}
+
+void BankedMemory::restore(Checkpoint &c) {
+
+	Memory::restore(c);
+	for (int i = 1; i <= _nbanks; i++)
+		banks[i]->restore(c);
+	wp.restore(c);
+}
+
 BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 
 	DBG_MEM("new bank %d bytes", bytes);
@@ -68,4 +87,10 @@ BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 BankedMemory::Bank::~Bank() {
 
 	if (_mem) free(_mem);
+}
+
+void BankedMemory::Bank::checkpoint(Checkpoint &c) {
+}
+
+void BankedMemory::Bank::restore(Checkpoint &c) {
 }

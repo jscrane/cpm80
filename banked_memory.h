@@ -25,12 +25,18 @@ public:
 		Bank(unsigned bytes);
 		virtual ~Bank();
 
-		virtual void operator=(uint8_t b) { _mem[_acc] = b; }
-		virtual operator uint8_t() { return _mem[_acc]; }
+		void operator=(uint8_t b) override { _mem[_acc] = b; }
+		operator uint8_t() override { return _mem[_acc]; }
+
+		void checkpoint(Checkpoint &) override;
+		void restore(Checkpoint &) override;
 
 	private:
 		uint8_t *_mem;
 	};
+
+	void checkpoint(Checkpoint &) override;
+	void restore(Checkpoint &) override;
 
 private:
 	uint8_t _bank, _nbanks;
