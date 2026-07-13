@@ -23,8 +23,8 @@ public:
 
 	virtual operator uint8_t() { return (uint8_t)(*_protect); }
 
-	void checkpoint(Checkpoint &) override { /* FIXME */ }
-	void restore(Checkpoint &) override { /* FIXME */ }
+	void checkpoint(Checkpoint &) override {}
+	void restore(Checkpoint &) override {}
 
 private:
 	friend class BankedMemory;
@@ -62,20 +62,28 @@ void BankedMemory::begin(uint8_t nbanks) {
 void BankedMemory::checkpoint(Checkpoint &c) {
 
 	Memory::checkpoint(c);
+
 	for (int i = 1; i <= _nbanks; i++)
 		banks[i]->checkpoint(c);
-	wp.checkpoint(c);
+
+	c.write(wp._wp_common);
+	c.write(wp._protect->base());
 }
 
 void BankedMemory::restore(Checkpoint &c) {
 
 	Memory::restore(c);
+
 	for (int i = 1; i <= _nbanks; i++)
 		banks[i]->restore(c);
-	wp.restore(c);
+
+	c.read(wp._wp_common);
+	Memory::address addr;
+	c.read(addr);
+	wp._protect = Memory::get(addr);
 }
 
-BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
+BankedMemory::Bank::Bank(size_t bytes): Memory::Device(bytes) {
 
 	DBG_MEM("new bank %d bytes", bytes);
 
@@ -85,12 +93,13 @@ BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 }
 
 BankedMemory::Bank::~Bank() {
-
 	if (_mem) free(_mem);
 }
 
 void BankedMemory::Bank::checkpoint(Checkpoint &c) {
+	c.write(_mem, extent());
 }
 
 void BankedMemory::Bank::restore(Checkpoint &c) {
+	c.read(_mem, extent());
 }

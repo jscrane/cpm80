@@ -22,7 +22,7 @@ public:
 
 	class Bank: public Memory::Device {
 	public:
-		Bank(unsigned bytes);
+		Bank(size_t bytes);
 		virtual ~Bank();
 
 		void operator=(uint8_t b) override { _mem[_acc] = b; }
