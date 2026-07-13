@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <display.h>
 #include <serial_dsp.h>
+#include <machine.h>
 #include <debugging.h>
 
 #include "config.h"
