@@ -1,13 +1,13 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include <machine.h>
 #include <memory.h>
 #include <display.h>
 #include <serial_kbd.h>
 #include <serial_dsp.h>
 #include <hardware.h>
 #include <debugging.h>
-#include <machine.h>
 
 #include "banked_memory.h"
 #include "io.h"

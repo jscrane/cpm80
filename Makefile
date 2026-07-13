@@ -40,7 +40,7 @@ endif
 
 ifeq ($t, esp32)
 TERMINAL_SPEED = 115200
-#CPPFLAGS += -DUSE_UZ80
+CPPFLAGS += -DUSE_UZ80
 LIBRARIES += FS
 
 ifeq ($b, lilygo)
