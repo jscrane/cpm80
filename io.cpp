@@ -88,7 +88,7 @@ uint8_t IO::in(uint16_t port) {
 	case CLK_CMD:
 		return clkfmt;
 	case TIMER:
-		return timer? 1: 0;
+		return timer >= 0? 1: 0;
 	case CON1_ST:
 	case CON2_ST:
 	case NET1_ST:
@@ -145,7 +145,7 @@ void IO::out(uint16_t port, uint8_t a) {
 		if (timer >= 0 && !a) {
 			_machine->cancel_timer(timer);
 			timer = -1;
-		} else if (!timer && a && tick_handler)
+		} else if (timer < 0 && a && tick_handler)
 			timer = _machine->interval_timer(10000, tick_handler);
 		break;
 	case CLK_CMD:
