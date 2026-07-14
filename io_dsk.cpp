@@ -25,6 +25,7 @@
 #include <serial_dsp.h>
 #include <machine.h>
 #include <debugging.h>
+#include <arduinomachine.h>
 
 #include "config.h"
 #include "banked_memory.h"
@@ -35,6 +36,7 @@
 
 #define MODE_READ	"r"
 #define MODE_READWRITE	"r+"
+#define MODE_WRITE	"w"
 
 static File drive;
 
@@ -199,4 +201,24 @@ uint8_t IO::dsk_setsec(uint16_t a) {
 
 	setsec = a;
 	return OK;
+}
+
+void IO::checkpoint() {
+
+	File img = DISK.open(PROGRAMS "machine.img", MODE_WRITE);
+	StreamCheckpoint c(img);
+	_machine->checkpoint(c);
+	img.close();
+}
+
+bool IO::restore() {
+
+	File img = DISK.open(PROGRAMS "machine.img", MODE_READ);
+	if (!img)
+		return false;
+
+	StreamCheckpoint c(img);
+	_machine->checkpoint(c);
+	img.close();
+	return true;
 }

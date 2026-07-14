@@ -43,12 +43,23 @@ static void reset(bool disk) {
 static bool debug_cpu;
 
 static void function_key(uint8_t fn) {
-	if (fn == 1)
+	switch (fn) {
+	case 1:
 		machine.reset();
-	else if (fn == 10)
+		break;
+	case 6:
+		io.checkpoint();
+		break;
+	case 7:
+		io.restore();
+		break;
+	case 10:
 		debug_cpu = !debug_cpu;
-	else if (fn == 11)
+		break;
+	case 11:
 		screen.statusf("%dHz", machine.current_speed());
+		break;
+	}
 }
 
 void setup(void) {

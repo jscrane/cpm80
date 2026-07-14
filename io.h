@@ -55,6 +55,9 @@ public:
 	void reset();
 	void register_timer_interrupt_handler(std::function<void(void)> fn) { tick_handler = fn; }
 
+	void checkpoint();
+	bool restore();
+
 private:
 	serial_kbd &_kbd;
 	uint8_t kbd_poll();
