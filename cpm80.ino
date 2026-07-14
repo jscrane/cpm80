@@ -48,10 +48,12 @@ static void function_key(uint8_t fn) {
 		machine.reset();
 		break;
 	case 6:
-		io.checkpoint();
+		if (!io.checkpoint())
+			ERR("Disk checkpoint failed");
 		break;
 	case 7:
-		io.restore();
+		if (!io.restore())
+			ERR("Disk restore failed");
 		break;
 	case 10:
 		debug_cpu = !debug_cpu;

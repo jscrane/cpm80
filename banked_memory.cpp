@@ -23,8 +23,8 @@ public:
 
 	virtual operator uint8_t() { return (uint8_t)(*_protect); }
 
-	void checkpoint(Checkpoint &) override {}
-	void restore(Checkpoint &) override {}
+	void checkpoint(Checkpoint &c) override { c.write(_wp_common); }
+	void restore(Checkpoint &c) override { c.read(_wp_common); }
 
 private:
 	friend class BankedMemory;
@@ -66,7 +66,7 @@ void BankedMemory::checkpoint(Checkpoint &c) {
 	for (int i = 1; i <= _nbanks; i++)
 		banks[i]->checkpoint(c);
 
-	c.write(wp._wp_common);
+	wp.checkpoint(c);
 	c.write(wp._protect->base());
 }
 
@@ -77,7 +77,7 @@ void BankedMemory::restore(Checkpoint &c) {
 	for (int i = 1; i <= _nbanks; i++)
 		banks[i]->restore(c);
 
-	c.read(wp._wp_common);
+	wp.restore(c);
 	Memory::address addr;
 	c.read(addr);
 	wp._protect = Memory::get(addr);

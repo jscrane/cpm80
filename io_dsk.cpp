@@ -203,12 +203,16 @@ uint8_t IO::dsk_setsec(uint16_t a) {
 	return OK;
 }
 
-void IO::checkpoint() {
+bool IO::checkpoint() {
 
 	File img = DISK.open(PROGRAMS "machine.img", MODE_WRITE);
+	if (!img)
+		return false;
+
 	StreamCheckpoint c(img);
 	_machine->checkpoint(c);
 	img.close();
+	return true;
 }
 
 bool IO::restore() {
