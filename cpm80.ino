@@ -7,6 +7,7 @@
 #include PROCESSOR_H
 #include "io.h"
 #include "console.h"
+#include "disk.h"
 #include "banked_memory.h"
 
 #if defined(USE_HOST_KBD)
@@ -43,8 +44,9 @@ uint8_t Console::available() { return kbd.available()? 0xff: 0x00; }
 void Console::write(uint8_t c) { screen.write(c); }
 
 Console console;
+Disk disk;
 BankedMemory memory;
-IO io(memory, console);
+IO io(memory, console, disk);
 processor_t cpu(memory);
 Arduino machine(cpu);
 

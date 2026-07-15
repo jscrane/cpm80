@@ -30,6 +30,7 @@
 #include "config.h"
 #include "banked_memory.h"
 #include "io.h"
+#include "disk.h"
 
 #define IMAGE_LEN	20
 #define DRIVE_LETTERS	26
@@ -60,8 +61,8 @@ static unsigned read_unsigned(File map) {
 	return u;
 }
 
-void IO::dsk_reset() {
-	trk = sec = 0xff;
+void Disk::reset() {
+	_trk = _sec = 0xff;
 
 	File map = DISK.open(PROGRAMS "drivemap.txt", MODE_READ);
 	if (!map) {
@@ -93,78 +94,70 @@ void IO::dsk_reset() {
 		DBG_DISK("%s: %d %d %d", p->image, p->tracks, p->seclen, p->sectrk);
 	}
 	map.close();
-
-	// read boot sector
-	settrk = 0;
-	setsec = 1;
-	setdma = 0;
-	dsk_select(0);
-	dsk_seek();
-	dsk_read();
 }
 
-bool IO::dsk_seek() {
+bool Disk::seek() {
 
-	if (trk != settrk || sec != setsec) {
-		trk = settrk;
-		sec = setsec;
-		int ok = drive.seek(dp->seclen*(dp->sectrk*trk + sec -1));
+	if (_trk != _settrk || _sec != _setsec) {
+		_trk = _settrk;
+		_sec = _setsec;
+		int ok = drive.seek(dp->seclen*(dp->sectrk*_trk + _sec -1));
 		return ok == 1;
 	}
 	return true;
 }
 
-uint8_t IO::dsk_read() {
+uint8_t Disk::read(Memory &mem) {
 
-	if (!dsk_seek()) {
+	if (!seek()) {
 		ERR("dsk_read: seek error");
-		return SEEK_ERROR;
+		return status(SEEK_ERROR);
 	}
 
 	uint8_t buf[dp->seclen];
 	int n = drive.read(buf, sizeof(buf));
 	if (n < 0 || n != sizeof(buf)) {
 		ERR("dsk_read: read error");
-		return READ_ERROR;
+		return status(READ_ERROR);
 	}
 	for (int i = 0; i < n; i++)
-		_mem[setdma + i] = buf[i];
-	sec++;
-	return OK;
+		mem[_setdma + i] = buf[i];
+	_sec++;
+	return status(OK);
 }
 
-uint8_t IO::dsk_write() {
+uint8_t Disk::write(Memory &mem) {
 
-	if (!dsk_seek()) {
+	if (!seek()) {
 		ERR("dsk_write: seek error");
-		return SEEK_ERROR;
+		return status(SEEK_ERROR);
 	}
 
 	uint8_t buf[dp->seclen];
 	for (unsigned i = 0; i < sizeof(buf); i++)
-		buf[i] = _mem[setdma + i];
+		buf[i] = mem[_setdma + i];
 
 	int n = drive.write(buf, sizeof(buf));
 	if (n < 0 || n != sizeof(buf)) {
 		ERR("dsk_write: write error");
-		return WRITE_ERROR;
+		return status(WRITE_ERROR);
 	}
-	sec++;
-	return OK;
+	_sec++;
+	return status(OK);
 }
 
-uint8_t IO::dsk_select(uint8_t a) {
+uint8_t Disk::select(uint8_t a) {
 
 	if (!drive_letters[a]) {
 		ERR("dsk_select: %d", a);
-		return ILLEGAL_DRIVE;
+		return status(ILLEGAL_DRIVE);
 	}
 
 	if (dp == drive_letters[a])
-		return OK;
+		return status(OK);
 
 	dp = drive_letters[a];
-	trk = sec = 0xff;
+	_trk = _sec = 0xff;
 	if (drive)
 		drive.close();
 
@@ -173,34 +166,34 @@ uint8_t IO::dsk_select(uint8_t a) {
 	drive = DISK.open(buf, MODE_READWRITE);
 	if (!drive) {
 		ERR("%s: open failed", buf);
-		return ILLEGAL_DRIVE;
+		return status(ILLEGAL_DRIVE);
 	}
 
-	return OK;
+	return status(OK);
 }
 
 // tracks are numbered from 0
-uint8_t IO::dsk_settrk(uint8_t a) {
+uint8_t Disk::track(uint8_t a) {
 
 	if (a >= dp->tracks) {
 		ERR("settrk: %d", a);
-		return ILLEGAL_TRACK;
+		return status(ILLEGAL_TRACK);
 	}
 
-	settrk = a;
-	return OK;
+	_settrk = a;
+	return status(OK);
 }
 
 // sectors are numbered from 1
-uint8_t IO::dsk_setsec(uint16_t a) {
+uint8_t Disk::sector(uint16_t a) {
 
 	if (a > dp->sectrk) {
 		ERR("setsec: %d", a);
-		return ILLEGAL_SECTOR;
+		return status(ILLEGAL_SECTOR);
 	}
 
-	setsec = a;
-	return OK;
+	_setsec = a;
+	return status(OK);
 }
 
 bool IO::checkpoint() {

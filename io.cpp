@@ -3,17 +3,24 @@
 
 #include <machine.h>
 #include <memory.h>
-#include <serial_kbd.h>
-#include <serial_dsp.h>
 #include <debugging.h>
 
 #include "banked_memory.h"
 #include "console.h"
 #include "io.h"
+#include "disk.h"
 
 void IO::reset() {
 	_console.reset();
-	dsk_reset();
+	_disk.reset();
+
+	// read boot sector
+	_disk.select(0);
+	_disk.track(0);
+	_disk.sector(1);
+	_disk.dma(0);
+	_disk.seek();
+	_disk.read(_mem);
 }
 
 uint8_t IO::clk_data() {
@@ -55,15 +62,15 @@ uint8_t IO::in(uint16_t port) {
 	case CON_IN:
 		return _console.poll();
 	case FDC_STATUS:
-		return dsk_status;
+		return _disk.status();
 	case FDC_IODONE:
 		return 1;
 	case FDC_GETSEC_L:
-		return setsec & 0xff;
+		return _disk.sector() & 0xff;
 	case FDC_GETSEC_H:
-		return (setsec & 0xff00) >> 8;
+		return (_disk.sector() & 0xff00) >> 8;
 	case FDC_GETTRK:
-		return settrk;
+		return _disk.track();
 	case MEM_INIT:
 		return _mem.num_banks();
 	case MEM_SELECT:
@@ -95,25 +102,25 @@ void IO::out(uint16_t port, uint8_t a) {
 
 	switch(port) {
 	case FDC_SELDSK:
-		dsk_status = dsk_select(a);
+		_disk.select(a);
 		break;
 	case FDC_SETTRK:
-		dsk_status = dsk_settrk(a);
+		_disk.track(a);
 		break;
 	case FDC_SETSEC_L:
-		dsk_status = dsk_setsec((setsec & 0xff00) | a);
+		_disk.sector((_disk.sector() & 0xff00) | a);
 		break;
 	case FDC_SETSEC_H:
-		dsk_status = dsk_setsec(a << 8 | (setsec & 0xff));
+		_disk.sector(a << 8 | (_disk.sector() & 0xff));
 		break;
 	case FDC_SETDMA_L:
-		setdma = (setdma & 0xff00) | a;
+		_disk.dma((_disk.dma() & 0xff00) | a);
 		break;
 	case FDC_SETDMA_H:
-		setdma = (a << 8) | (setdma & 0xff);
+		_disk.dma((a << 8) | (_disk.dma() & 0xff));
 		break;
 	case FDC_IO:
-		dsk_status = (a? dsk_write(): dsk_read());
+		a? _disk.write(_mem): _disk.read(_mem);
 		break;
 	case CON_OUT:
 		_console.write(a);

@@ -1,7 +1,5 @@
 #pragma once
 
-class serial_kbd;
-
 // input ports: A = IN(n)
 // (see https://github.com/udo-munk/z80pack/blob/master/cpmsim/srcsim/simio.c)
 #define CON_ST		0
@@ -33,22 +31,13 @@ class serial_kbd;
 #define TIMER		27
 #define MONITOR		29
 
-// disk errors
-#define OK		0
-#define ILLEGAL_DRIVE	1
-#define ILLEGAL_TRACK	2
-#define ILLEGAL_SECTOR	3
-#define SEEK_ERROR	4
-#define READ_ERROR	5
-#define WRITE_ERROR	6
-#define ILLEGAL_CMD	7
-
 class BankedMemory;
 class Console;
+class Disk;
 
 class IO {
 public:
-	IO(BankedMemory &mem, Console &console): _console(console), _mem(mem) {}
+	IO(BankedMemory &mem, Console &console, Disk &disk): _console(console), _disk(disk), _mem(mem) {}
 
 	uint8_t in(uint16_t p);
 	void out(uint16_t p, uint8_t b);
@@ -61,18 +50,7 @@ public:
 
 private:
 	Console &_console;
-
-	void dsk_reset();
-	uint8_t dsk_read();
-	uint8_t dsk_write();
-	bool dsk_seek();
-	uint8_t dsk_select(uint8_t a);
-	uint8_t dsk_settrk(uint8_t a);
-	uint8_t dsk_setsec(uint16_t a);
-	uint8_t settrk, trk;
-	uint16_t setsec, sec;
-	uint16_t setdma;
-	uint8_t dsk_status;
+	Disk &_disk;
 
 	std::function<void(void)> tick_handler;
 	int8_t timer = -1;
