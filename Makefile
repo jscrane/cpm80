@@ -5,6 +5,7 @@ TERMINAL_SPEED := 115200
 #TERMINAL_EXTRA_FLAGS := -C serialout.txt
 CPPFLAGS = -O3 -DUNDOCUMENTED_OPS
 #CPPFLAGS += -DDEBUGGING=0x2ff
+#CPPFLAGS += -DDEBUGGING=0x21
 LIBRARIES = Adafruit_GFX Adafruit_BusIO Wire
 FS_DIR := disks/$p
 SD_DIR := \"/$p/\"
@@ -40,7 +41,7 @@ endif
 
 ifeq ($t, esp32)
 TERMINAL_SPEED = 115200
-CPPFLAGS += -DUSE_UZ80
+CPPFLAGS += -DUSE_Z80
 LIBRARIES += FS
 
 ifeq ($b, lilygo)

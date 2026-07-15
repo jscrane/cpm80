@@ -6,6 +6,8 @@
 #include "config.h"
 #include PROCESSOR_H
 #include "io.h"
+#include "console.h"
+#include "banked_memory.h"
 
 #if defined(USE_HOST_KBD)
 hw_serial_kbd kbd(Serial);
@@ -20,10 +22,29 @@ hw_serial_dsp screen(Serial);
 screen screen;
 #endif
 
-#include "banked_memory.h"
-BankedMemory memory;
+#include "console.h"
 
-IO io(memory, kbd, screen);
+void Console::reset() {
+	kbd.reset();
+	screen.reset();
+}
+
+uint8_t Console::poll() {
+	uint8_t c;
+	do {
+		_machine->yield();
+		c = kbd.read();
+	} while (c == 0xff);
+	return c;
+}
+
+uint8_t Console::available() { return kbd.available()? 0xff: 0x00; }
+
+void Console::write(uint8_t c) { screen.write(c); }
+
+Console console;
+BankedMemory memory;
+IO io(memory, console);
 processor_t cpu(memory);
 Arduino machine(cpu);
 
@@ -83,7 +104,13 @@ void setup(void) {
 	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT);
 #endif
 
-	machine.set_cpu_debugging([]() { return debug_cpu; });
+	machine.set_cpu_debugging([]() {
+		if (cpu.pc() == 0x0066) {
+			DBG_EMU("%02x%02x wp=%02x", (uint8_t)memory[0xfeff], (uint8_t)memory[0xff00], memory.wp_common());
+			return true;
+		}
+		return false;
+	});
 	machine.register_reset_handler(reset);
 	machine.reset();
 }

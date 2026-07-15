@@ -3,28 +3,17 @@
 
 #include <machine.h>
 #include <memory.h>
-#include <display.h>
 #include <serial_kbd.h>
 #include <serial_dsp.h>
-#include <hardware.h>
 #include <debugging.h>
 
 #include "banked_memory.h"
+#include "console.h"
 #include "io.h"
 
 void IO::reset() {
-	_kbd.reset();
-	_dsp.reset();
+	_console.reset();
 	dsk_reset();
-}
-
-uint8_t IO::kbd_poll() {
-	uint8_t c;
-	do {
-		_machine->yield();
-		c = _kbd.read();
-	} while (c == 0xff);
-	return c;
 }
 
 uint8_t IO::clk_data() {
@@ -62,9 +51,9 @@ uint8_t IO::in(uint16_t port) {
 
 	switch (port) {
 	case CON_ST:
-		return _kbd.available()? 0xff: 0x00;
+		return _console.available();
 	case CON_IN:
-		return kbd_poll();
+		return _console.poll();
 	case FDC_STATUS:
 		return dsk_status;
 	case FDC_IODONE:
@@ -127,7 +116,7 @@ void IO::out(uint16_t port, uint8_t a) {
 		dsk_status = (a? dsk_write(): dsk_read());
 		break;
 	case CON_OUT:
-		_dsp.write(a);
+		_console.write(a);
 		break;
 	case MEM_INIT:
 		_mem.begin(a);

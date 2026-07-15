@@ -44,10 +44,11 @@ class serial_kbd;
 #define ILLEGAL_CMD	7
 
 class BankedMemory;
+class Console;
 
 class IO {
 public:
-	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp): _kbd(kbd), _mem(mem), _dsp(dsp) {}
+	IO(BankedMemory &mem, Console &console): _console(console), _mem(mem) {}
 
 	uint8_t in(uint16_t p);
 	void out(uint16_t p, uint8_t b);
@@ -59,8 +60,7 @@ public:
 	bool restore();
 
 private:
-	serial_kbd &_kbd;
-	uint8_t kbd_poll();
+	Console &_console;
 
 	void dsk_reset();
 	uint8_t dsk_read();
@@ -82,6 +82,4 @@ private:
 	uint8_t clkfmt, clkcmd;
 
 	BankedMemory &_mem;
-
-	serial_dsp &_dsp;
 };
