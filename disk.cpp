@@ -196,7 +196,7 @@ uint8_t Disk::sector(uint16_t a) {
 	return status(OK);
 }
 
-bool IO::checkpoint() {
+bool Disk::checkpoint() {
 
 	File img = DISK.open(PROGRAMS "machine.img", MODE_WRITE);
 	if (!img)
@@ -208,7 +208,7 @@ bool IO::checkpoint() {
 	return true;
 }
 
-bool IO::restore() {
+bool Disk::restore() {
 
 	File img = DISK.open(PROGRAMS "machine.img", MODE_READ);
 	if (!img)

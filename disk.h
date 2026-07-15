@@ -28,6 +28,9 @@ public:
 	uint16_t sector() const { return _setsec; }
 	uint16_t dma() const { return _setdma; }
 
+	bool checkpoint();
+	bool restore();
+
 private:
 	uint8_t status(uint8_t s) { _status = s; return s; }
 

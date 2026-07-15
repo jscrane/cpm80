@@ -71,11 +71,11 @@ static void function_key(uint8_t fn) {
 		machine.reset();
 		break;
 	case 6:
-		if (!io.checkpoint())
+		if (!disk.checkpoint())
 			ERR("Disk checkpoint failed");
 		break;
 	case 7:
-		if (!io.restore())
+		if (!disk.restore())
 			ERR("Disk restore failed");
 		break;
 	case 10:

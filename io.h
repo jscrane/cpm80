@@ -45,9 +45,6 @@ public:
 	void reset();
 	void register_timer_interrupt_handler(std::function<void(void)> fn) { tick_handler = fn; }
 
-	bool checkpoint();
-	bool restore();
-
 private:
 	Console &_console;
 	Disk &_disk;
