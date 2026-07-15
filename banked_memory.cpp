@@ -11,9 +11,9 @@ static class WriteProtect: public Memory::Device {
 public:
 	WriteProtect(): Memory::Device(0), _wp_common(0) {}
 
-	virtual void access(Memory::address addr) { _protect->access(addr); }
+	void access(Memory::address addr) override { _protect->access(addr); }
 
-	virtual void operator=(uint8_t b) {
+	void operator=(uint8_t b) override {
 
 		if (_wp_common)
 			_wp_common |= 0x80;
@@ -21,7 +21,7 @@ public:
 			(*_protect) = b;
 	}
 
-	virtual operator uint8_t() { return (uint8_t)(*_protect); }
+	operator uint8_t() override { return (uint8_t)(*_protect); }
 
 	void checkpoint(Checkpoint &c) override { c.write(_wp_common); }
 	void restore(Checkpoint &c) override { c.read(_wp_common); }
