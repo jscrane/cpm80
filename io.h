@@ -37,7 +37,7 @@ class Disk;
 
 class IO {
 public:
-	IO(BankedMemory &mem, Console &console, Disk &disk): _console(console), _disk(disk), _mem(mem) {}
+	IO(BankedMemory &mem, serial_kbd &kbd, serial_dsp &dsp, Disk &disk): _kbd(kbd), _dsp(dsp), _disk(disk), _mem(mem) {}
 
 	uint8_t in(uint16_t p);
 	void out(uint16_t p, uint8_t b);
@@ -46,8 +46,10 @@ public:
 	void register_timer_interrupt_handler(std::function<void(void)> fn) { tick_handler = fn; }
 
 private:
-	Console &_console;
-	Disk &_disk;
+	serial_kbd &_kbd;
+	uint8_t kbd_poll();
+
+	serial_dsp &_dsp;
 
 	std::function<void(void)> tick_handler;
 	int8_t timer = -1;
@@ -56,5 +58,6 @@ private:
 	void clk_cmd(uint8_t);
 	uint8_t clkfmt, clkcmd;
 
+	Disk &_disk;
 	BankedMemory &_mem;
 };

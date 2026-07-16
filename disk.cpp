@@ -29,7 +29,6 @@
 
 #include "config.h"
 #include "banked_memory.h"
-#include "io.h"
 #include "disk.h"
 
 #define IMAGE_LEN	20

@@ -4,6 +4,8 @@
 #include <machine.h>
 #include <memory.h>
 #include <debugging.h>
+#include <serial_kbd.h>
+#include <serial_dsp.h>
 
 #include "banked_memory.h"
 #include "console.h"
@@ -11,7 +13,8 @@
 #include "disk.h"
 
 void IO::reset() {
-	_console.reset();
+	_kbd.reset();
+	_dsp.reset();
 	_disk.reset();
 
 	// read boot sector
@@ -21,6 +24,15 @@ void IO::reset() {
 	_disk.dma(0);
 	_disk.seek();
 	_disk.read(_mem);
+}
+
+uint8_t IO::kbd_poll() {
+	uint8_t c;
+	do {
+		_machine->yield();
+		c = _kbd.read();
+	} while (c == 0xff);
+	return c;
 }
 
 uint8_t IO::clk_data() {
@@ -58,9 +70,9 @@ uint8_t IO::in(uint16_t port) {
 
 	switch (port) {
 	case CON_ST:
-		return _console.available();
+		return _kbd.available()? 0xff: 0x00;
 	case CON_IN:
-		return _console.poll();
+		return kbd_poll();
 	case FDC_STATUS:
 		return _disk.status();
 	case FDC_IODONE:
@@ -123,7 +135,7 @@ void IO::out(uint16_t port, uint8_t a) {
 		a? _disk.write(_mem): _disk.read(_mem);
 		break;
 	case CON_OUT:
-		_console.write(a);
+		_dsp.write(a);
 		break;
 	case MEM_INIT:
 		_mem.begin(a);

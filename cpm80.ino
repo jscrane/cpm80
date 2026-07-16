@@ -23,30 +23,9 @@ hw_serial_dsp screen(Serial);
 screen screen;
 #endif
 
-#include "console.h"
-
-void Console::reset() {
-	kbd.reset();
-	screen.reset();
-}
-
-uint8_t Console::poll() {
-	uint8_t c;
-	do {
-		_machine->yield();
-		c = kbd.read();
-	} while (c == 0xff);
-	return c;
-}
-
-uint8_t Console::available() { return kbd.available()? 0xff: 0x00; }
-
-void Console::write(uint8_t c) { screen.write(c); }
-
-Console console;
 Disk disk;
 BankedMemory memory;
-IO io(memory, console, disk);
+IO io(memory, kbd, screen, disk);
 processor_t cpu(memory);
 Arduino machine(cpu);
 
