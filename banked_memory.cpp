@@ -11,9 +11,9 @@ static class WriteProtect: public Memory::Device {
 public:
 	WriteProtect(): Memory::Device(0), _wp_common(0) {}
 
-	virtual void access(Memory::address addr) { _protect->access(addr); }
+	void access(Memory::address addr) override { _protect->access(addr); }
 
-	virtual void operator=(uint8_t b) {
+	void operator=(uint8_t b) override {
 
 		if (_wp_common)
 			_wp_common |= 0x80;
@@ -21,7 +21,10 @@ public:
 			(*_protect) = b;
 	}
 
-	virtual operator uint8_t() { return (uint8_t)(*_protect); }
+	operator uint8_t() override { return (uint8_t)(*_protect); }
+
+	void checkpoint(Checkpoint &c) override { c.write(_wp_common); }
+	void restore(Checkpoint &c) override { c.read(_wp_common); }
 
 private:
 	friend class BankedMemory;
@@ -56,7 +59,31 @@ void BankedMemory::begin(uint8_t nbanks) {
 		banks[i] = new Bank(_bank_size);
 }
 
-BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
+void BankedMemory::checkpoint(Checkpoint &c) {
+
+	Memory::checkpoint(c);
+
+	for (int i = 1; i <= _nbanks; i++)
+		banks[i]->checkpoint(c);
+
+	wp.checkpoint(c);
+	c.write(wp._protect->base());
+}
+
+void BankedMemory::restore(Checkpoint &c) {
+
+	Memory::restore(c);
+
+	for (int i = 1; i <= _nbanks; i++)
+		banks[i]->restore(c);
+
+	wp.restore(c);
+	Memory::address addr;
+	c.read(addr);
+	wp._protect = Memory::get(addr);
+}
+
+BankedMemory::Bank::Bank(size_t bytes): Memory::Device(bytes) {
 
 	DBG_MEM("new bank %d bytes", bytes);
 
@@ -66,6 +93,13 @@ BankedMemory::Bank::Bank(unsigned bytes): Memory::Device(bytes) {
 }
 
 BankedMemory::Bank::~Bank() {
-
 	if (_mem) free(_mem);
+}
+
+void BankedMemory::Bank::checkpoint(Checkpoint &c) {
+	c.write(_mem, extent());
+}
+
+void BankedMemory::Bank::restore(Checkpoint &c) {
+	c.read(_mem, extent());
 }

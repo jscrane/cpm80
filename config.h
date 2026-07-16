@@ -1,13 +1,5 @@
 #pragma once
 
-// max number of entries in drivemap.txt
-// hardwired into BIOS:
-// ;       fixed data tables for four-drive standard
-// ;       ibm-compatible 8" disks
-#define FD_DRIVES	4
-#define HD_DRIVES	2
-#define DRIVES (FD_DRIVES + HD_DRIVES)
-
 #if !defined(PROGRAMS)
 #if defined(USE_SD)
 #define PROGRAMS	"/cpm80/"

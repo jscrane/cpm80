@@ -6,6 +6,9 @@
 #include "config.h"
 #include PROCESSOR_H
 #include "io.h"
+#include "disk.h"
+#include "flash_disk.h"
+#include "banked_memory.h"
 
 #if defined(USE_HOST_KBD)
 hw_serial_kbd kbd(Serial);
@@ -20,10 +23,9 @@ hw_serial_dsp screen(Serial);
 screen screen;
 #endif
 
-#include "banked_memory.h"
+FlashDisk disk;
 BankedMemory memory;
-
-IO io(memory, kbd, screen);
+IO io(memory, kbd, screen, disk);
 processor_t cpu(memory);
 Arduino machine(cpu);
 
@@ -43,12 +45,25 @@ static void reset(bool disk) {
 static bool debug_cpu;
 
 static void function_key(uint8_t fn) {
-	if (fn == 1)
+	switch (fn) {
+	case 1:
 		machine.reset();
-	else if (fn == 10)
+		break;
+	case 6:
+		if (!disk.checkpoint())
+			ERR("Disk checkpoint failed");
+		break;
+	case 7:
+		if (!disk.restore())
+			ERR("Disk restore failed");
+		break;
+	case 10:
 		debug_cpu = !debug_cpu;
-	else if (fn == 11)
+		break;
+	case 11:
 		screen.statusf("%dHz", machine.current_speed());
+		break;
+	}
 }
 
 void setup(void) {
