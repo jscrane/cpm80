@@ -6,7 +6,6 @@
 #include "config.h"
 #include PROCESSOR_H
 #include "io.h"
-#include "console.h"
 #include "disk.h"
 #include "banked_memory.h"
 

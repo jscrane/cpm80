@@ -8,7 +8,6 @@
 #include <serial_dsp.h>
 
 #include "banked_memory.h"
-#include "console.h"
 #include "io.h"
 #include "disk.h"
 
