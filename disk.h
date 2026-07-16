@@ -66,8 +66,4 @@ private:
 	uint16_t _setsec, _sec;
 	uint16_t _setdma;
 	uint8_t _status;
-
-	// geometry of the currently selected drive
-	uint8_t _tracks, _seclen;
-	uint16_t _sectrk;
 };

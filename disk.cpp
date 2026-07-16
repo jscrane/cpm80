@@ -65,10 +65,6 @@ uint8_t Disk::select(uint8_t a) {
 		return status(ILLEGAL_DRIVE);
 
 	dp = drive_letters[a];
-	_tracks = dp->tracks;
-	_seclen = dp->seclen;
-	_sectrk = dp->sectrk;
-
 	_trk = _sec = 0xff;
 	return status(OK);
 }
@@ -78,7 +74,7 @@ bool Disk::seek() {
 	if (_trk != _settrk || _sec != _setsec) {
 		_trk = _settrk;
 		_sec = _setsec;
-		return _seek((long)_seclen * (_sectrk * _trk + _sec - 1));
+		return _seek((long)dp->seclen * (dp->sectrk * _trk + _sec - 1));
 	}
 	return true;
 }
@@ -90,9 +86,9 @@ uint8_t Disk::read(Memory &mem) {
 		return status(SEEK_ERROR);
 	}
 
-	uint8_t buf[_seclen];
-	int n = _read(buf, _seclen);
-	if (n < 0 || (unsigned)n != _seclen) {
+	uint8_t buf[dp->seclen];
+	int n = _read(buf, sizeof(buf));
+	if (n < 0 || (unsigned)n != sizeof(buf)) {
 		ERR("disk: read error");
 		return status(READ_ERROR);
 	}
@@ -109,12 +105,12 @@ uint8_t Disk::write(Memory &mem) {
 		return status(SEEK_ERROR);
 	}
 
-	uint8_t buf[_seclen];
-	for (unsigned i = 0; i < _seclen; i++)
+	uint8_t buf[dp->seclen];
+	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = mem[_setdma + i];
 
-	int n = _write(buf, _seclen);
-	if (n < 0 || (unsigned)n != _seclen) {
+	int n = _write(buf, sizeof(buf));
+	if (n < 0 || (unsigned)n != sizeof(buf)) {
 		ERR("disk: write error");
 		return status(WRITE_ERROR);
 	}
@@ -124,7 +120,7 @@ uint8_t Disk::write(Memory &mem) {
 
 uint8_t Disk::track(uint8_t a) {
 
-	if (a >= _tracks) {
+	if (a >= dp->tracks) {
 		ERR("disk: settrk: %d", a);
 		return status(ILLEGAL_TRACK);
 	}
@@ -134,7 +130,7 @@ uint8_t Disk::track(uint8_t a) {
 
 uint8_t Disk::sector(uint16_t a) {
 
-	if (a > _sectrk) {
+	if (a > dp->sectrk) {
 		ERR("disk: setsec: %d", a);
 		return status(ILLEGAL_SECTOR);
 	}
