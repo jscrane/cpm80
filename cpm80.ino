@@ -84,13 +84,7 @@ void setup(void) {
 	memory.put(sram, SPIRAM_BASE, SPIRAM_EXTENT);
 #endif
 
-	machine.set_cpu_debugging([]() {
-		if (cpu.pc() == 0x0066) {
-			DBG_EMU("%02x%02x wp=%02x", (uint8_t)memory[0xfeff], (uint8_t)memory[0xff00], memory.wp_common());
-			return true;
-		}
-		return false;
-	});
+	machine.set_cpu_debugging([]() { return debug_cpu; });
 	machine.register_reset_handler(reset);
 	machine.reset();
 }
