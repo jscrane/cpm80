@@ -33,32 +33,25 @@
 #include "flash_disk.h"
 
 #define IMAGE_LEN	20
-#define DRIVE_LETTERS	26
 
 #define MODE_READ	"r"
 #define MODE_READWRITE	"r+"
 #define MODE_WRITE	"w"
 
 static File drive;
+static char images[DRIVES][IMAGE_LEN];
 
-typedef struct disk_parameters {
-	uint8_t tracks, seclen;
-	uint16_t sectrk;
-	char image[IMAGE_LEN];
-} disk_params_t;
-
-static disk_params_t disk_params[DRIVES];
-static disk_params_t *drive_letters[DRIVE_LETTERS], *dp;
-
-static unsigned read_unsigned(File map) {
-	unsigned u = 0;
-	for(;;) {
-		char ch = map.read();
-		if (ch < '0' || ch > '9')
-			break;
-		u = u * 10 + (ch - '0');
+static uint32_t size(const char *filename) {
+	char buf[64];
+	snprintf(buf, sizeof(buf), PROGRAMS "%s", filename);
+	File file = DISK.open(buf, MODE_READ);
+	if (file) {
+		uint32_t s = file.size();
+		file.close();
+		return s;
 	}
-	return u;
+	ERR("file not found: %s", filename);
+	return 0;
 }
 
 void FlashDisk::reset() {
@@ -75,54 +68,42 @@ void FlashDisk::reset() {
 			break;
 		if (ch == '\n')
 			continue;
-		disk_params_t *p = &disk_params[i];
-		drive_letters[ch - 'A'] = p;
+		int drive_letter = ch - 'A';
 		map.read();	// skip ':'
 		// read image-name
+		char image[IMAGE_LEN];
 		for (int j = 0; j < IMAGE_LEN; j++) {
 			ch = map.read();
-			if (ch == ' ') {
-				p->image[j] = 0;
+			if (ch == '\n') {
+				image[j] = 0;
 				break;
 			}
-			p->image[j] = ch;
+			image[j] = ch;
 		}
-		p->tracks = read_unsigned(map);
-		p->seclen = read_unsigned(map);
-		p->sectrk = read_unsigned(map);
-		DBG_DISK("%s: %d %d %d", p->image, p->tracks, p->seclen, p->sectrk);
+		int drive_id = _add_drive(drive_letter, size(image));
+		if (0 > drive_id) {
+			ERR("failed to add drive %s", image);
+			break;
+		}
+		strncpy(images[drive_id], image, IMAGE_LEN);
+		DBG_DISK("added: %d %s %d", drive_letter, image, drive_id);
 	}
 	map.close();
 }
 
-uint8_t FlashDisk::select(uint8_t a) {
+bool FlashDisk::_open(uint8_t drive_id) {
 
-	if (!drive_letters[a]) {
-		ERR("dsk_select: %d", a);
-		return status(ILLEGAL_DRIVE);
-	}
-
-	if (dp == drive_letters[a])
-		return status(OK);
-
-	dp = drive_letters[a];
-	_drive_changed();
 	if (drive)
 		drive.close();
 
 	char buf[64];
-	snprintf(buf, sizeof(buf), PROGRAMS "%s", dp->image);
+	snprintf(buf, sizeof(buf), PROGRAMS "%s", images[drive_id]);
 	drive = DISK.open(buf, MODE_READWRITE);
 	if (!drive) {
 		ERR("%s: open failed", buf);
-		return status(ILLEGAL_DRIVE);
+		return false;
 	}
-
-	_tracks = dp->tracks;
-	_seclen = dp->seclen;
-	_sectrk = dp->sectrk;
-
-	return status(OK);
+	return true;
 }
 
 bool FlashDisk::_seek(long pos) {

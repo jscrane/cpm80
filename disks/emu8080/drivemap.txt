@@ -1,5 +1,5 @@
-A:cpma.cpm 77 128 26
-B:zork1.cpm 77 128 26
-C:volks4th.cpm 77 128 26
-D:volks4th2.cpm 77 128 26
+A:cpma.cpm
+B:zork1.cpm
+C:volks4th.cpm
+D:volks4th2.cpm
 
