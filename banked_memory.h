@@ -2,6 +2,8 @@
 
 class BankedMemory: public Memory {
 public:
+	BankedMemory(): _bank(0), _nbanks(1) {}
+
 	Device *get(address at) const override;
 
 	void begin(uint8_t nbanks);
