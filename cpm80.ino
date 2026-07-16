@@ -7,6 +7,7 @@
 #include PROCESSOR_H
 #include "io.h"
 #include "disk.h"
+#include "flash_disk.h"
 #include "banked_memory.h"
 
 #if defined(USE_HOST_KBD)
@@ -22,7 +23,7 @@ hw_serial_dsp screen(Serial);
 screen screen;
 #endif
 
-Disk disk;
+FlashDisk disk;
 BankedMemory memory;
 IO io(memory, kbd, screen, disk);
 processor_t cpu(memory);

@@ -12,13 +12,20 @@
 
 class Memory;
 
+// Common CP/M-style sector I/O bookkeeping. Platform subclasses (flash_disk,
+// linux_disk) only need to implement drive selection/reset and the raw
+// byte-oriented primitives below (_seek/_read/_write); the track/sector
+// state machine and sector-sized read/write logic is shared here.
 class Disk {
 public:
-	void reset();
+	virtual ~Disk() {}
+
+	virtual void reset() =0;
+	virtual uint8_t select(uint8_t) =0;
+
 	uint8_t read(Memory &);
 	uint8_t write(Memory &);
 	bool seek();
-	uint8_t select(uint8_t);
 	uint8_t track(uint8_t);
 	uint8_t sector(uint16_t);
 	void dma(uint16_t a) { _setdma = a; }
@@ -28,12 +35,30 @@ public:
 	uint16_t sector() const { return _setsec; }
 	uint16_t dma() const { return _setdma; }
 
-	bool checkpoint();
-	bool restore();
+	// machine-snapshot-to-storage; not every platform supports this,
+	// so subclasses that don't need it can just leave it unimplemented
+	virtual bool checkpoint() { return false; }
+	virtual bool restore() { return false; }
 
-private:
+protected:
 	uint8_t status(uint8_t s) { _status = s; return s; }
 
+	// geometry of the currently selected drive; select() overrides
+	// must set these before returning OK
+	uint8_t _tracks, _seclen;
+	uint16_t _sectrk;
+
+	// call from select() when switching to a different physical drive,
+	// to force the next access to re-seek rather than trust a stale
+	// track/sector position left over from the previous drive
+	void _drive_changed() { _trk = _sec = 0xff; }
+
+	// raw, platform-specific byte I/O on the currently selected drive
+	virtual bool _seek(long pos) =0;
+	virtual int _read(uint8_t *buf, size_t len) =0;
+	virtual int _write(const uint8_t *buf, size_t len) =0;
+
+private:
 	uint8_t _settrk, _trk;
 	uint16_t _setsec, _sec;
 	uint16_t _setdma;

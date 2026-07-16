@@ -32,7 +32,8 @@
 #define MONITOR		29
 
 class BankedMemory;
-class Console;
+class serial_kbd;
+class serial_dsp;
 class Disk;
 
 class IO {
