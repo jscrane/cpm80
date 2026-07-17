@@ -15,7 +15,7 @@ typedef struct disk_parameters {
 } disk_params_t;
 
 static disk_params_t disk_params[DRIVES];
-static disk_params_t *drive_letters[DRIVE_LETTERS], *dp;
+static disk_params_t *drive_letters[DRIVE_LETTERS], *drive_ptr;
 static int next_drive = 0;
 
 static const struct { uint32_t size; uint8_t tracks, seclen; uint16_t sectrk; } known_geometries[] = {
@@ -54,39 +54,45 @@ int Disk::_add_drive(int drive_letter, uint32_t size) {
 uint8_t Disk::select(uint8_t a) {
 
 	if (!drive_letters[a]) {
-		ERR("disk select: %d", a);
+		drive_ptr = 0;
 		return status(ILLEGAL_DRIVE);
 	}
 
-	if (dp && dp == drive_letters[a])
+	if (drive_ptr == drive_letters[a])
 		return status(OK);
 
 	if (!_open(drive_letters[a]->drive_id))
 		return status(ILLEGAL_DRIVE);
 
-	dp = drive_letters[a];
+	drive_ptr = drive_letters[a];
 	_trk = _sec = 0xff;
 	return status(OK);
 }
 
 bool Disk::seek() {
 
+	if (!drive_ptr)
+		return status(ILLEGAL_DRIVE);
+
 	if (_trk != _settrk || _sec != _setsec) {
 		_trk = _settrk;
 		_sec = _setsec;
-		return _seek((long)dp->seclen * (dp->sectrk * _trk + _sec - 1));
+		return _seek((long)drive_ptr->seclen * (drive_ptr->sectrk * _trk + _sec - 1));
 	}
 	return true;
 }
 
 uint8_t Disk::read(Memory &mem) {
 
+	if (!drive_ptr)
+		return status(ILLEGAL_DRIVE);
+
 	if (!seek()) {
 		ERR("disk: seek error");
 		return status(SEEK_ERROR);
 	}
 
-	uint8_t buf[dp->seclen];
+	uint8_t buf[drive_ptr->seclen];
 	int n = _read(buf, sizeof(buf));
 	if (n < 0 || (unsigned)n != sizeof(buf)) {
 		ERR("disk: read error");
@@ -100,12 +106,15 @@ uint8_t Disk::read(Memory &mem) {
 
 uint8_t Disk::write(Memory &mem) {
 
+	if (!drive_ptr)
+		return status(ILLEGAL_DRIVE);
+
 	if (!seek()) {
 		ERR("disk: seek error");
 		return status(SEEK_ERROR);
 	}
 
-	uint8_t buf[dp->seclen];
+	uint8_t buf[drive_ptr->seclen];
 	for (unsigned i = 0; i < sizeof(buf); i++)
 		buf[i] = mem[_setdma + i];
 
@@ -120,7 +129,10 @@ uint8_t Disk::write(Memory &mem) {
 
 uint8_t Disk::track(uint8_t a) {
 
-	if (a >= dp->tracks) {
+	if (!drive_ptr)
+		return status(ILLEGAL_DRIVE);
+
+	if (a >= drive_ptr->tracks) {
 		ERR("disk: settrk: %d", a);
 		return status(ILLEGAL_TRACK);
 	}
@@ -130,7 +142,10 @@ uint8_t Disk::track(uint8_t a) {
 
 uint8_t Disk::sector(uint16_t a) {
 
-	if (a > dp->sectrk) {
+	if (!drive_ptr)
+		return status(ILLEGAL_DRIVE);
+
+	if (a > drive_ptr->sectrk) {
 		ERR("disk: setsec: %d", a);
 		return status(ILLEGAL_SECTOR);
 	}
