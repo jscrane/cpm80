@@ -3,6 +3,7 @@
 class BankedMemory: public Memory {
 public:
 	BankedMemory(): _bank(0), _nbanks(1) {}
+	virtual ~BankedMemory();
 
 	Device *get(address at) const override;
 

@@ -8,15 +8,12 @@
 #endif
 #endif
 
-#if defined(USE_Z80)
-#define PROCESSOR_H	"z80.h"
-typedef class z80 processor_t;
-#elif defined(USE_UZ80)
-#define PROCESSOR_H	"uz80.h"
-typedef class uz80 processor_t;
-#else
+#if defined(USE_I8080)
 #define PROCESSOR_H	"i8080.h"
 typedef class i8080 processor_t;
+#else
+#define PROCESSOR_H	"z80.h"
+typedef class z80 processor_t;
 #endif
 
 #define RAM_BASE	0x0000u
