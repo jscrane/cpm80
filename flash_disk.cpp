@@ -56,6 +56,9 @@ static uint32_t size(const char *filename) {
 
 void FlashDisk::reset() {
 
+	if (drive)
+		drive.close();
+
 	File map = DISK.open(PROGRAMS "drivemap.txt", MODE_READ);
 	if (!map) {
 		ERR(PROGRAMS "drivemap.txt: open failed");
