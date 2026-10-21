@@ -34,6 +34,8 @@ private:
 	Device *_protect;
 } wp;
 
+static bool checkpointing = false;
+
 uint8_t BankedMemory::wp_common() const { return wp._wp_common; }
 
 void BankedMemory::wp_common(uint8_t b) { wp._wp_common = b; }
@@ -41,6 +43,9 @@ void BankedMemory::wp_common(uint8_t b) { wp._wp_common = b; }
 static BankedMemory::Bank **banks;
 
 Memory::Device *BankedMemory::get(address addr) const {
+
+	if (::checkpointing)
+		return Memory::get(addr);
 
 	if (addr < _bank_size)
 		return _bank > 0? banks[_bank]: Memory::get(addr);
@@ -68,26 +73,42 @@ BankedMemory::~BankedMemory() {
 
 void BankedMemory::checkpoint(Checkpoint &c) {
 
+	::checkpointing = true;
+
+	DBG_MEM("checkpoint: memory");
 	Memory::checkpoint(c);
 
-	for (int i = 1; i <= _nbanks; i++)
+	for (int i = 1; i <= _nbanks; i++) {
+		DBG_MEM("checkpoint: bank %d", i);
 		banks[i]->checkpoint(c);
+	}
 
 	wp.checkpoint(c);
 	c.write(wp._protect->base());
+
+	DBG_MEM("checkpoint: done");
+	::checkpointing = false;
 }
 
 void BankedMemory::restore(Checkpoint &c) {
 
+	::checkpointing = true;
+
+	DBG_MEM("restore: memory");
 	Memory::restore(c);
 
-	for (int i = 1; i <= _nbanks; i++)
+	for (int i = 1; i <= _nbanks; i++) {
+		DBG_MEM("restore: bank %d", i);
 		banks[i]->restore(c);
+	}
 
 	wp.restore(c);
 	Memory::address addr;
 	c.read(addr);
 	wp._protect = Memory::get(addr);
+
+	DBG_MEM("restore: done");
+	::checkpointing = false;
 }
 
 BankedMemory::Bank::Bank(size_t bytes): Memory::Device(bytes) {
