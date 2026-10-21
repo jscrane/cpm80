@@ -38,6 +38,14 @@ Edit ```disks/drivemap.txt``` to assign the new disk to a drive.
 
 Use of SD card storage is recommended where possible.
 
+Function Keys
+-------------
+- `F1` (`Ctrl-N`): machine reset
+- `F6` (`Ctrl-S`): checkpoint machine state to disk
+- `F7` (`Ctrl-T`): restore machine state from disk
+- `F10` (`Ctrl-W`): toggle CPU debugging (if compiled with debugging enabled)
+- `F11` (`Ctrl-X`): report current CPU speed
+
 CP/M in ROM
 -----------
 A previous system was a "CP/M in ROM".
