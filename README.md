@@ -96,3 +96,8 @@ The emulation is now actually of the machine defined by `z80pack` and has succes
 
 This [BIOS](https://github.com/udo-munk/z80pack/blob/master/cpmsim/srccpm2/bios.asm) has support for hard-disk images (4MB).
 
+Processors
+----------
+
+By default the `z80` processor is used.  The `i8080` processor emulation may be enabled with the compiler flag `-DUSE_I8080`. 
+It will _not_ work with `Fuzix`!
